@@ -39,3 +39,22 @@ Since there is always a need to find out information about what your character
 is carrying—and other such details—there will be a set of meta-game commands,
 all generally of the form `(verb noun)`, such as `(list items)`.  There will be
 more of these, certainly, but for the moment that's the only one I can think of.
+
+# Ranging #
+
+I had thought about this before, and in the context of combat I think it's a
+good idea—even for other stuff, though.  Most of these MUDs are based around a
+complete description of a room, before you've even started to act on the
+information.  Instead, I'd suggest having a delineation of ranges: 0-2m being
+very close, 3-4 being moderate range, 5-8 being far range, and 9-16 being very
+long range (with anything outside of that being much more difficult to make
+out/have limited ways of interacting with).  Basically, this provides a context
+for combat and non-combat interactions; simple conversation is only intelligible
+in close range, while shouts are intelligible through far range, and yells
+through very long range—after all, you don't usually hear someone talking 16m
+away.  Combat would have similar restrictions—outside of very long range, you're
+not likely to see or hear an opponent, let alone have much to hit them with
+(excepting some very powerful equipment, but we might come up with a "mêlée" and a
+"distance" definition of ranging, especially since magical combat at a distance
+could be excellent.)
+
