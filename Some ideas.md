@@ -58,3 +58,9 @@ not likely to see or hear an opponent, let alone have much to hit them with
 "distance" definition of ranging, especially since magical combat at a distance
 could be excellent.)
 
+# Code organization #
+
+There's a few directions the organization of the code can go in:
+- One Game module, with a separate interface module
+- Modules separating out game infrastructure, player actions, interface, and
+  other components
