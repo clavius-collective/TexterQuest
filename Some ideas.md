@@ -32,3 +32,10 @@ spells and the complexity are unrelated, or only somewhat related) and the
 strength of the resulting spell is dictated by another.  I would think it handy
 to have multiple different scores to track your character's powers in each type
 of magic, as well.
+
+# Meta-game syntax #
+
+Since there is always a need to find out information about what your character
+is carrying—and other such details—there will be a set of meta-game commands,
+all generally of the form `(verb noun)`, such as `(list items)`.  There will be
+more of these, certainly, but for the moment that's the only one I can think of.
