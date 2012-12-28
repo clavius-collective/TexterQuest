@@ -63,4 +63,38 @@ could be excellent.)
 There's a few directions the organization of the code can go in:
 - One Game module, with a separate interface module
 - Modules separating out game infrastructure, player actions, interface, and
-  other components
+  other components.
+  
+Re-thinking this, the first one is a better idea, we'll just need to stick to
+some namespace-ish conventions to keep the modules distinct.  Shame OCaml
+doesn't have namespaces.
+
+Now, here's where David claims we should use modules instead of the object
+system; instead, I'm going to withhold judgement on which of the two I'd rather
+use at the moment, and instead consider simply the necessary divisions of
+constructs necessary, as that may in part dictate the choice of device.
+
+
+# Arrangement of data constructs #
+
+- Character
+  * Playable Character
+  * Non-player character (possibly divided into noncombatant and combatant)
+- Item
+  * Food
+  * Good
+  * Luxury
+  * Tool
+  * Offensive
+    - Mêlée weapon
+    - Ranged weapon
+  * Defensive
+    - Armour
+    - Shield
+  * Preparation (alchemical, etc.)
+    - Buff
+    - Debuff
+    - Healing
+    - Attacking
+    - Miscellaneous (most difficult to determine)
+- Some unit of map space, which needs to be worked out in more detail.
