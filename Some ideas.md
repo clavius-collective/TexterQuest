@@ -58,6 +58,11 @@ not likely to see or hear an opponent, let alone have much to hit them with
 "distance" definition of ranging, especially since magical combat at a distance
 could be excellent.)
 
+David's very solid idea for ranging, at least in exploring rooms, is to have the
+map set up as nodes in a graph, with spacing nodes between areas (and distance
+decorations on the edges between nodes); this would result in a sense of space.
+Combat, I think, would need to be handled differently.
+
 # Code organization #
 
 There's a few directions the organization of the code can go in:
@@ -98,3 +103,31 @@ constructs necessary, as that may in part dictate the choice of device.
     - Attacking
     - Miscellaneous (most difficult to determine)
 - Some unit of map space, which needs to be worked out in more detail.
+
+# Spell structure #
+
+We've talked about spells being formed out of syllables and words; there needs
+to be some sort of pattern to this.
+
+There's a few components to consider:
+- Strength of spells
+- Spell effects
+  * Number of effects (elements) of a spell
+  * Strength of each effect (element)
+  * Contradictory effects/elements—how well can they be combined?
+- Failure possibility? (I would think there's lower limits on when a spell might
+  fail; someone with a great enough control of magic isn't likely to flub a
+  single-element spell.)
+
+## Magic stats ##
+
+I've been considering how we can split up the stats applied to magic; the most
+basic division is between strength and control, but I think there needs to be a
+resilience/magical defence stat.  In that case, there would be the following:
+- Magical Strength: Enforces how powerful a spell will be, in general (with a
+  floor, which varies with the level of strength.)
+- Magical Control: Defines how many components of a spell can be combined, as
+  well as how "variable" the components are; a spell which combines multiple
+  contradictory or at least generally hard-to-relate components will require far
+  more control than one which uses only those from one genre.
+- Magical Defence: How well you survive against others' spells.
