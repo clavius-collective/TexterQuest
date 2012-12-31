@@ -131,3 +131,21 @@ resilience/magical defence stat.  In that case, there would be the following:
   contradictory or at least generally hard-to-relate components will require far
   more control than one which uses only those from one genre.
 - Magical Defence: How well you survive against others' spells.
+
+# Wound code #
+
+As of how we have it now, wounds will work like so:
+
+    (* Defines the levels of damage that can be taken *)
+    type severity = Minor | Serious | Critical
+    (* Collects wounds into different categories *)
+    let minor, serious, critical = List.fold_left (fun (a,b,c) (sev, _) -> match
+    sev with Minor -> (a+1,b,c) | Serious -> (a,b+1,c) | Critical -> (a,b,c+1))
+    (0,0,0) wounds
+    (* Removes wounds which have healed *)
+    let heal character = character.wounds <- List.filter (fun (_, t) -> t <> 0)
+    (List.map (fun (w, t) -> w, t - 1) character.wounds)
+
+Some of this should be implemented in a Wound module, with the following type
+definition: `type wounds.t = severity * int list`
+    
