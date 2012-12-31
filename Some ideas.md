@@ -147,5 +147,5 @@ As of how we have it now, wounds will work like so:
     (List.map (fun (w, t) -> w, t - 1) character.wounds)
 
 Some of this should be implemented in a Wound module, with the following type
-definition: `type wounds.t = severity * int list`
+definition: `type wounds.t = (severity * int) list`
     
