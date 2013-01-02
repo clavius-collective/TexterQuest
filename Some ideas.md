@@ -149,3 +149,13 @@ As of how we have it now, wounds will work like so:
 Some of this should be implemented in a Wound module, with the following type
 definition: `type wounds.t = (severity * int) list`
     
+# Implementing traits #
+
+Traits fall into one of three categories: Attributes, physical and mental
+characteristics; Skills, related to crafting and other non-combat activities;
+and Affinities, related to branches of magic. (Later, an expansion of this will
+include weapons.)
+
+Each of the categories, then, can be defined as an enumerated type, and any
+function related to it can use the variant type in order to avoid specifying too
+much.
