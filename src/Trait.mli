@@ -1,4 +1,4 @@
-(* Copyright (C) 2012 Ben Lewis and David Donna *)
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
 (* Licensed under LGPLv3 *)
 
 (* Enumerated types for Attributes, Skills, and Affinities *)
@@ -48,3 +48,14 @@ type affinity = Solar
 type trait = Attribute of attribute
              | Skill of skill
              | Affinity of affinity
+
+
+(* Determines the current value of a trait *)
+val current_value : Actor -> trait -> float
+
+(* Determine the current experience step *)
+val current_step : Actor -> trait -> float
+
+(* Increase trait by a given amount of experience *)
+val add_experience : Actor -> trait -> int -> unit
+
