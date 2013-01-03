@@ -5,7 +5,8 @@ become infeasible as more interdependent modules are created. So, it is
 recommended that we create a types.ml at the top of the project, or weaken
 type safety by using globally defined types (e.g. string instead of Room.t).
 
-This code can be used to 
+This code can be used to make a minimal MUD, once a server and interaction
+loop are created. I'll probably get to that tomorrow (jan 3).
 *)
 
 type room_id = string
