@@ -1,3 +1,6 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* Licensed under LGPLv3 *)
+
 (*
 This file is toy code. Currently, the mutual dependence of the Actor and Room
 modules is resolved by using recursive modules. However, this will likely
@@ -13,6 +16,8 @@ type room_id = string
 
 module Actor : sig
   type t
+  
+  val create : string -> string -> t
   val get_name : t -> string
   val get_loc : t -> room_id
   val set_loc : t -> room_id -> unit
@@ -21,14 +26,19 @@ end = struct
     name : string;
     mutable location : room_id;
   }
-    
+
+  let create name location = {
+    name;
+    location;
+  }
+  
   let get_name a = a.name
   let get_loc a = a.location
   let set_loc a r = a.location <- r
 end
 
 module Room : sig
-  val exit : Actor.t -> room_id -> unit
+  val leave : Actor.t -> room_id -> unit
   val enter : Actor.t -> room_id -> unit
   val move : Actor.t -> int -> unit
 
@@ -52,7 +62,7 @@ end = struct
     exits;
   }
 
-  let exit actor id =
+  let leave actor id =
     let rm = get id in
     rm.actors <- List.filter (fun a -> a <> actor) rm.actors
 
@@ -65,7 +75,7 @@ end = struct
 
   let move actor i =
     let from = Actor.get_loc actor in
-    exit actor from;
+    leave actor from;
     enter actor (get_exit from i)
 
   let list_actors id =
