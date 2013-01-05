@@ -13,8 +13,6 @@
 *)
 
 
-open Unix
-
 type room_id = string
 
 module Actor : sig
@@ -106,62 +104,74 @@ end = struct
       (list_exits id)
 end
 
-let main () =
-  let clients = ref [] in
-  let pcs = Hashtbl.create 100 in
+(* let module type SERVER : sig  *)
 
-  let get_character client_sock client_addr = 
-    let char = Actor.create client_addr "start" in
-    Hashtbl.remove pcs client_sock;
-    Hashtbl.add pcs client_sock char;
-    char
-  in
+(* end *)
 
-  Room.create "start" "the starting zone" [|"other", "another room"|];
-  Room.create "other" "the other room" [|"start", "the first room"|];
+module Reactor = (* functor (Server : SERVER) ->  *)struct
+  open Unix
 
-  let server =
-    let server_sock = socket PF_INET SOCK_STREAM 0 in
-    setsockopt server_sock SO_REUSEADDR true;
-    let address = (gethostbyname(gethostname ())).h_addr_list.(0) in
-    bind server_sock (ADDR_INET (address, 1029));
-    listen server_sock 10;
-    server_sock
-  in
-  
-  let new_name =
-    let number = ref 0 in
-    fun () ->
-      incr number;
-      "player_" ^ (string_of_int !number)
-  in
+  let process_input input sock =
+    ignore (send sock input 0 (String.length input) [])
 
-  let accept_client () =
-    let (sock, addr) = accept server in
-    clients := sock :: !clients;
-    let char = get_character sock (new_name ()) in
-    Room.enter char "start";
+  let start () =
+
+    let clients = ref [] in
+    let pcs = Hashtbl.create 100 in
+
+    let get_character client_sock client_addr = 
+      let char = Actor.create client_addr "start" in
+      Hashtbl.remove pcs client_sock;
+      Hashtbl.add pcs client_sock char;
+      char
+    in
+
+    Room.create "start" "the starting zone" [|"other", "another room"|];
+    Room.create "other" "the other room" [|"start", "the first room"|];
+
+    let server =
+      let server_sock = socket PF_INET SOCK_STREAM 0 in
+      setsockopt server_sock SO_REUSEADDR true;
+      let address = (gethostbyname(gethostname ())).h_addr_list.(0) in
+      bind server_sock (ADDR_INET (address, 1029));
+      listen server_sock 10;
+      server_sock
+    in
     
-    let str = "Hello\n" in
-    let len = String.length str in
-    ignore (send sock str 0 len [])
-  in
+    let new_name =
+      let number = ref 0 in
+      fun () ->
+        incr number;
+        "player_" ^ (string_of_int !number)
+    in
 
-  let handle sock =
-    let max_len = 1024 in
-    if sock = server then
-      accept_client ()
-    else
-      let buffer = String.create max_len in
-      let len = recv sock buffer 0 max_len [] in
-      let return = String.sub buffer 0 len in
-      print_endline return;
-      ignore (send sock return 0 len [])
-  in
+    let accept_client () =
+      let (sock, addr) = accept server in
+      clients := sock :: !clients;
+      let char = get_character sock (new_name ()) in
+      Room.enter char "start";
+      
+      let str = "Hello\n" in
+      let len = String.length str in
+      ignore (send sock str 0 len [])
+    in
 
-  while true do
-    let input, _, _ = select (server::!clients) [] [] (-1.0) in
-    List.iter handle input
-  done
+    let read sock =
+      let max_len = 1024 in
+      if sock = server then
+        accept_client ()
+      else
+        let buffer = String.create max_len in
+        let len = recv sock buffer 0 max_len [] in
+        let input = String.sub buffer 0 len in
+        process_input input sock
+    in
 
-let _ = main ()
+    while true do
+      let input, _, _ = select (server::!clients) [] [] (-1.0) in
+      List.iter read input
+    done
+
+end
+
+let _ = Reactor.start ()
