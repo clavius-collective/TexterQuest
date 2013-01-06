@@ -14,7 +14,10 @@
 
 type room_id = string
 let id s = s
-type formatted_string = Format of string
+type formatted_string =
+    Newline
+  | Format of string
+  | Concat of formatted_string * formatted_string
 let format s = Format s
 
 module Actor : sig
@@ -153,10 +156,17 @@ module Telnet = struct
       incr count;
       "user_" ^ (string_of_int !count)
 
-  let send_output sock = function
+  let send_raw sock s = ignore (send sock s 0 (String.length s) [])
+
+  let rec send_output sock = function
       Format s -> 
         let output = s ^ "\n" in
-        ignore (send sock output 0 (String.length output) [])
+        send_raw sock output
+    | Newline ->
+        send_raw sock "\n"
+    | Concat (s1, s2) ->
+        send_output sock s1;
+        send_output sock s2
 
   let process_input sock input =
     let output = Game.process_input (Hashtbl.find users sock) input in
