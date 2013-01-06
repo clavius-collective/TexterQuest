@@ -50,6 +50,7 @@ module Room : sig
   val describe : room_id -> string
 end = struct
   type room = {
+    id : room_id;
     mutable actors : Actor.t list;
     description : string;
     exits : (room_id * string) array;
@@ -61,6 +62,7 @@ end = struct
       
   let create id description exits =
     let room = {
+      id;
       actors = [];
       description;
       exits;
