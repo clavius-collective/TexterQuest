@@ -12,13 +12,15 @@
   loop are created. I'll probably get to that tomorrow (jan 3).
 *)
 
-
 type room_id = string
+let id s = s
+type formatted_string = Format of string
+let format s = Format s
 
 module Actor : sig
   type t
     
-  val create : string -> string -> t
+  val create : string -> room_id -> t
   val get_name : t -> string
   val get_loc : t -> room_id
   val set_loc : t -> room_id -> unit
@@ -40,8 +42,8 @@ end
   
 module Room : sig
   val create : room_id -> string -> (room_id * string) array -> unit
-    
-  val leave : Actor.t -> room_id -> unit
+
+  val leave : Actor.t -> unit
   val enter : Actor.t -> room_id -> unit
   val move : Actor.t -> int -> unit
     
@@ -55,7 +57,7 @@ end = struct
     description : string;
     exits : (room_id * string) array;
   }
-      
+  
   let rooms = Hashtbl.create 100
 
   let get = Hashtbl.find rooms
@@ -69,7 +71,8 @@ end = struct
     } in
     Hashtbl.add rooms id room
     
-  let leave actor id =
+  let leave actor =
+    let id = Actor.get_loc actor in
     let rm = get id in
     rm.actors <- List.filter (fun a -> a <> actor) rm.actors
       
@@ -82,7 +85,7 @@ end = struct
     
   let move actor i =
     let from = Actor.get_loc actor in
-    leave actor from;
+    leave actor;
     enter actor (get_exit from i)
       
   let list_actors id =
@@ -106,27 +109,61 @@ end = struct
       (list_exits id)
 end
 
-(* let module type SERVER : sig  *)
+module Game : sig
+  type player = string
+  val process_input : player -> string -> formatted_string
+  val player_login : player -> formatted_string
+  val player_logout : player -> unit
+end = struct
+  type player = string
 
-(* end *)
+  let players = Hashtbl.create 100
 
-module Reactor = (* functor (Server : SERVER) ->  *)struct
+  let get_character = Hashtbl.find players
+
+  let init_character = 
+    let initial_location = id "start" in
+    let count = ref 0 in
+    fun player ->
+      incr count;
+      let name = "player_" ^ (string_of_int !count) in
+      Actor.create name initial_location
+
+  let player_login p =
+    let character = init_character p in
+    Hashtbl.add players p character;
+    let room = Actor.get_loc character in
+    Room.enter character room;
+    format (Room.describe room)
+
+  let player_logout p =
+    Room.leave (get_character p);
+    Hashtbl.remove players p
+
+  let process_input p s = format s
+end
+
+module Telnet = struct
   open Unix
 
-  let process_input input sock =
-    ignore (send sock input 0 (String.length input) [])
+  let users = Hashtbl.create 100
+  let new_user =
+    let count = ref 0 in
+    fun () ->
+      incr count;
+      "user_" ^ (string_of_int !count)
+
+  let send_output sock = function
+      Format s -> 
+        let output = s ^ "\n" in
+        ignore (send sock output 0 (String.length output) [])
+
+  let process_input sock input =
+    let output = Game.process_input (Hashtbl.find users sock) input in
+    send_output sock output
 
   let start () =
-
     let clients = ref [] in
-    let pcs = Hashtbl.create 100 in
-
-    let get_character client_sock client_addr = 
-      let char = Actor.create client_addr "start" in
-      Hashtbl.remove pcs client_sock;
-      Hashtbl.add pcs client_sock char;
-      char
-    in
 
     Room.create "start" "the starting zone" [|"other", "another room"|];
     Room.create "other" "the other room" [|"start", "the first room"|];
@@ -140,25 +177,15 @@ module Reactor = (* functor (Server : SERVER) ->  *)struct
       server_sock
     in
     
-    let new_name =
-      let number = ref 0 in
-      fun () ->
-        incr number;
-        "player_" ^ (string_of_int !number)
-    in
-
     let accept_client () =
       let (sock, addr) = accept server in
       clients := sock :: !clients;
-      let char = get_character sock (new_name ()) in
-      Room.enter char "start";
-      
-      let str = "Hello\n" in
-      let len = String.length str in
-      ignore (send sock str 0 len [])
+      let player = new_user () in
+      Hashtbl.add users sock player;
+      send_output sock (Game.player_login player)
     in
 
-    let read sock =
+    let handle sock =
       let max_len = 1024 in
       if sock = server then
         accept_client ()
@@ -166,14 +193,15 @@ module Reactor = (* functor (Server : SERVER) ->  *)struct
         let buffer = String.create max_len in
         let len = recv sock buffer 0 max_len [] in
         let input = String.sub buffer 0 len in
-        process_input input sock
+        let endline = Str.regexp "\r?\n\r?" in
+        List.iter (process_input sock) (Str.split endline input)
     in
 
     while true do
       let input, _, _ = select (server::!clients) [] [] (-1.0) in
-      List.iter read input
+      List.iter handle input
     done
 
 end
 
-let _ = Reactor.start ()
+let _ = Telnet.start ()
