@@ -220,6 +220,9 @@ module Telnet = struct
       send_output sock (Game.player_login player)
     in
 
+    let remove_client sock =
+      clients := List.filter (fun s -> s <> sock) !clients
+
     let handle sock =
       let max_len = 1024 in
       if sock = server then
@@ -227,9 +230,12 @@ module Telnet = struct
       else
         let buffer = String.create max_len in
         let len = recv sock buffer 0 max_len [] in
-        let input = String.sub buffer 0 len in
-        let endline = Str.regexp "\r?\n\r?" in
-        List.iter (process_input sock) (Str.split endline input)
+        match len with
+            0 -> remove_client sock
+          | _ ->
+              let input = String.sub buffer 0 len in
+              let endline = Str.regexp "\r?\n\r?" in
+              List.iter (process_input sock) (Str.split endline input)
     in
 
     while true do
