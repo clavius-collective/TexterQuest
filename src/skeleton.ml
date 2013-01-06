@@ -47,12 +47,12 @@ module Room : sig
   val create : room_id -> string -> (room_id * string) array -> unit
 
   val leave : Actor.t -> unit
-  val enter : Actor.t -> room_id -> unit
-  val move : Actor.t -> int -> unit
+  val enter : Actor.t -> room_id -> formatted_string
+  val move : Actor.t -> int -> formatted_string
     
   val list_actors : room_id -> string
   val list_exits : room_id -> string
-  val describe : room_id -> string
+  val describe : room_id -> formatted_string
 end = struct
   type room = {
     id : room_id;
@@ -74,6 +74,28 @@ end = struct
     } in
     Hashtbl.add rooms id room
     
+  let get_exit id i = fst (get id).exits.(i - 1)
+    
+  let list_actors id =
+    let actors = (get id).actors in
+    match actors with
+        [] -> "nobody is here"
+      | [x] -> (Actor.get_name x) ^ " is here"
+      | l -> (String.concat ", " (List.map Actor.get_name l)) ^ " are here"
+          
+  let list_exits id =
+    "Exits are: " ^
+      (String.concat ", "
+         (Array.to_list
+            (Array.mapi
+               (fun i (_, s) -> "(" ^ (string_of_int (i + 1)) ^ ") " ^ s)
+               (get id).exits)))
+      
+  let describe id = format
+    ((get id).description ^ "\n* " ^
+        (list_actors id) ^ "\n* " ^
+        (list_exits id))
+
   let leave actor =
     let id = Actor.get_loc actor in
     let rm = get id in
@@ -82,34 +104,32 @@ end = struct
   let enter actor id = 
     let rm = get id in
     Actor.set_loc actor id;
-    rm.actors <- actor::rm.actors
+    rm.actors <- actor::rm.actors;
+    describe id
       
-  let get_exit id i = fst (get id).exits.(i)
-    
   let move actor i =
     let from = Actor.get_loc actor in
+    let into = get_exit from i in
     leave actor;
-    enter actor (get_exit from i)
-      
-  let list_actors id =
-    let actors = (get id).actors in
-    match actors with
-        [] -> "Nobody is here."
-      | [x] -> (Actor.get_name x) ^ " is here."
-      | l -> (String.concat ", " (List.map Actor.get_name l)) ^ " are here."
-          
-  let list_exits id =
-    "Exits are:\n" ^
-      (String.concat "\n"
-         (Array.to_list
-            (Array.mapi
-               (fun i (_, s) -> "\n(" ^ (string_of_int i) ^ ") " ^ s)
-               (get id).exits)))
-      
-  let describe id =
-    (get id).description ^ "\n\n" ^
-      (list_actors id) ^ "\n\n" ^
-      (list_exits id)
+    enter actor into
+end
+
+module Action : sig
+  type t =
+      Nothing
+    | Move of int
+
+  val action_of_string : string -> t
+end = struct
+  type t = 
+      Nothing
+    | Move of int
+
+  let action_of_string s =
+    let whitespace = Str.regexp "[ \t]+" in
+    match Str.split whitespace s with
+        "move"::i::_ -> Move (int_of_string i)
+      | _ -> Nothing
 end
 
 module Game : sig
@@ -136,18 +156,23 @@ end = struct
     let character = init_character p in
     Hashtbl.add players p character;
     let room = Actor.get_loc character in
-    Room.enter character room;
-    format (Room.describe room)
+    Room.enter character room
 
   let player_logout p =
     Room.leave (get_character p);
     Hashtbl.remove players p
 
-  let process_input p s = format s
+  let process_input p s =
+    let open Action in
+    match action_of_string s with
+        Nothing -> format s
+      | Move i -> Room.move (get_character p) i
 end
 
 module Telnet = struct
   open Unix
+
+  type user = file_descr
 
   let users = Hashtbl.create 100
   let new_user =
