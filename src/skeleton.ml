@@ -12,14 +12,10 @@
   loop are created. I'll probably get to that tomorrow (jan 3).
 *)
 
+include Util
+
 let do_debug = ref false
 let debug s = if !do_debug then print_endline (">> " ^ s)
-
-let generate (f : int -> 'a) : unit -> 'a =
-  let _counter = ref 0 in
-  fun () ->
-    incr _counter;
-    f !_counter
 
 type room_id = string
 let id s = s
@@ -158,7 +154,7 @@ end = struct
 
   let get_character = Hashtbl.find players
 
-  let init_character = generate
+  let init_character = Util.generate
     (fun i player ->
       let initial_location = id "start" in
       let name = "player_" ^ (string_of_int i) in
@@ -192,11 +188,7 @@ module Telnet = struct
   type user = file_descr
 
   let users = Hashtbl.create 100
-  let new_user =
-    let count = ref 0 in
-    fun () ->
-      incr count;
-      "user_" ^ (string_of_int !count)
+  let new_user = Util.generate (fun i -> "user_" ^ (string_of_int i))
 
   let send_output sock s =
     let rec send_part = function
