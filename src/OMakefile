@@ -1,0 +1,16 @@
+BYTE_ENABLED = true
+NATIVE_ENABLED = true
+
+USE_OCAMLFIND = true
+
+OCAMLPACKS[] =
+	 unix
+	 str
+
+FILES[] =
+	util
+	skeleton
+
+PROGRAM = test
+
+.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))

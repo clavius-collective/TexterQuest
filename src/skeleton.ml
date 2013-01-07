@@ -18,7 +18,7 @@ let do_debug = ref false
 let debug s = if !do_debug then print_endline (">> " ^ s)
 
 type room_id = string
-let id s = s
+
 type fstring =
   | Raw of string
   | Bold of fstring
@@ -156,7 +156,7 @@ end = struct
 
   let init_character = Util.generate
     (fun i player ->
-      let initial_location = id "start" in
+      let initial_location = "start" in
       let name = "player_" ^ (string_of_int i) in
       Actor.create name initial_location)
 
@@ -236,7 +236,7 @@ module Telnet = struct
       let player = new_user () in
       Hashtbl.add users sock player;
       List.iter (send_output sock) [
-        Raw "\n";
+        Raw "TEXTER QUEST\n";
         Game.player_login player
       ]
     in
@@ -253,7 +253,9 @@ module Telnet = struct
         let buffer = String.create max_len in
         let len = recv sock buffer 0 max_len [] in
         match len with
-          | 0 -> remove_client sock
+          | 0 -> 
+              debug ((Hashtbl.find users sock) ^ "disconnected");
+              remove_client sock
           | _ ->
               let input = String.sub buffer 0 len in
               let endline = Str.regexp "\r?\n\r?" in
