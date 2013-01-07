@@ -1,16 +1,25 @@
 BYTE_ENABLED = true
 NATIVE_ENABLED = true
-
 USE_OCAMLFIND = true
+
+.PHONY: clean
 
 OCAMLPACKS[] =
 	 unix
 	 str
 
 FILES[] =
+	types
 	util
-	skeleton
+	actor
+	room
+	action
+	game
+	telnet
 
 PROGRAM = test
 
 .DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
+
+clean:
+	rm -f *.c* *.o $(PROGRAM) $(PROGRAM).opt $(PROGRAM).run
