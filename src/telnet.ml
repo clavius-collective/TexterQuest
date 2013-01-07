@@ -27,7 +27,7 @@ module Telnet = struct
 
   let send_output sock s =
     let rec send_part = function
-      | Raw s -> 
+      | Raw s ->
           ignore (send sock s 0 (String.length s) [])
       | Bold s | Italic s | Underline s | Color (_, s) ->
           send_part s
@@ -88,7 +88,7 @@ module Telnet = struct
         let buffer = String.create max_len in
         let len = recv sock buffer 0 max_len [] in
         match len with
-          | 0 -> 
+          | 0 ->
               debug ((Hashtbl.find users sock) ^ "disconnected");
               remove_client sock
           | _ ->

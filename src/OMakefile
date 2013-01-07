@@ -23,4 +23,4 @@ OCamlProgram($(PROGRAM), $(FILES))
 .DEFAULT: $(PROGRAM)
 
 clean:
-	rm -f *.c* *.o $(PROGRAM)*
+	rm *.c* *.o* $(PROGRAM)*

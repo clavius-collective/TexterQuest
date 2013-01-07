@@ -1,3 +1,5 @@
+.PHONY: clean
+
 OCAMLPACKS[] =
 	 str
 
@@ -9,4 +11,7 @@ ABSTRACT_FILES[] =
 	action
 	game
 
-OCamlLibrary(abstract, $(ABSTRACT_FILES))
+OCamlLibrary(libabstract, $(ABSTRACT_FILES))
+
+clean:
+	rm *.c* *.o* libabstract*
