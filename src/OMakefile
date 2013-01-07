@@ -3,23 +3,24 @@ NATIVE_ENABLED = true
 USE_OCAMLFIND = true
 
 .PHONY: clean
-
-OCAMLPACKS[] =
-	 unix
-	 str
-
-FILES[] =
-	types
-	util
-	actor
-	room
-	action
-	game
-	telnet
+.SUBDIRS: abstract
 
 PROGRAM = test
 
-.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
+OCAML_LIBS[] =
+	abstract/libabstract
+
+OCAMLINCLUDES += $(dir abstract)
+
+OCAML_OTHER_LIBS[] =
+	unix
+	str
+
+FILES[] =
+	telnet
+
+OCamlProgram($(PROGRAM), $(FILES))
+.DEFAULT: $(PROGRAM)
 
 clean:
-	rm -f *.c* *.o $(PROGRAM) $(PROGRAM).opt $(PROGRAM).run
+	rm -f *.c* *.o $(PROGRAM)*

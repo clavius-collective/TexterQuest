@@ -1,0 +1,12 @@
+OCAMLPACKS[] =
+	 str
+
+ABSTRACT_FILES[] =
+	types
+	util
+	actor
+	room
+	action
+	game
+
+OCamlLibrary(abstract, $(ABSTRACT_FILES))
