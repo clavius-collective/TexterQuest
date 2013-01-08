@@ -1,8 +1,8 @@
-let get_time = Unix.time
+let get_time () : int = truncate (Unix.time ())
 
 type t = {
   mutable value : float;
-  mutable masks : ((float -> float) * float) list
+  mutable masks : ((int -> int) * int) list
 }
 
 let add_mask t func duration =
@@ -11,11 +11,6 @@ let add_mask t func duration =
 
 let value t =
   let time = get_time () in
-
-  (* apply and remember only unexpired masks
-     use fold_right so newer masks are applied last
-  *)
-
   let final_val, masks =
     List.fold_right
       (fun ((func, expire) as mask) (total, active) ->
@@ -24,9 +19,9 @@ let value t =
         else
           total, active)
       t.masks
-      (t.value, [])
+      (truncate t.value, [])
   in
   t.masks <- masks;
   final_val
 
-let raw_value t = t.value
+let raw_value t = truncate t.value

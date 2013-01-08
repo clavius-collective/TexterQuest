@@ -8,7 +8,7 @@ module M = struct
     mutable masks : t mask list;
   }
       
-  let create ?(masks=[]) v = { v; masks }
+  let create ?(masks = []) v = { v; masks }
   let pr x = print_endline (string_of_int x.v)
     
   let incr x = { x with v = x.v + 1 }
@@ -41,19 +41,20 @@ end) -> struct
     in
     Obj.set_masks x masks;
     masked      
-end;;
+end
 
 module F = Masked(M);;
 
-let x = M.create 1 in
-M.pr (F.see x);
-F.mask x M.incr 3.;
-M.pr (F.see x);
-F.mask x M.incr 3.;
-M.pr (F.see x);
-F.mask x M.double 1.;
-M.pr (F.see x);
-Unix.sleep 2;
-M.pr (F.see x);
-Unix.sleep 2;
-M.pr (F.see x)
+let _ =
+  let x = M.create 1 in
+  M.pr (F.see x);                         (* 1 *)
+  F.mask x M.incr 2.;
+  M.pr (F.see x);                         (* 1 + 1 = 2 *)
+  F.mask x M.incr 2.;
+  M.pr (F.see x);                         (* 1 + (1 + 1) = 3 *)
+  F.mask x M.double 1.;
+  M.pr (F.see x);                         (* 2 * (1 + (1 + 1)) = 6 *)
+  Unix.sleep 1;
+  M.pr (F.see x);                         (* the double expires (3) *)
+  Unix.sleep 1;
+  M.pr (F.see x)                          (* the incrs expire (1) *)
