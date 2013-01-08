@@ -8,3 +8,6 @@
 *.cmxs
 *.cmxa
 *~
+.typerex
+*.omc
+.omakedb*
