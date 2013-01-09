@@ -1,12 +1,38 @@
-type aspect = []
-type attribute = []
-type skill = []
+type aspect = [
+  `Solar | `Lunar | `Astral              (* celestial *)
+| `Frost | `Bio | `Terra | `Aqua | `Aero (* natural *)
+| `Ego | `Ethos                          (* psychic *)
+| `Shadow | `Light | `Chroma             (* chromatic *)
+| `Flux | `Static | `Chaos | `Sync       (* synergistic *)
+| `Life | `Death                         (* cyclic *)
+]
+
+type attribute = [
+  `Might
+| `Mettle
+| `Chutzpah
+]
+
+type skill = [
+  `Enchant | `Alchemy                   (* magic *)
+| `Melee | `Ranged                      (* weapon *)
+]
+
 type trait = [ aspect | attribute | skill ]
 
-let all_aspects = []
-let all_attribute = []
-let all_skills = []
-let all_traits = all_aspects @ all_attributes @ all_traits
+let all_aspects = [
+  `Solar; `Lunar; `Astral; `Frost; `Bio; `Terra; `Aqua; `Aero; `Ego; `Ethos;
+  `Shadow; `Light; `Chroma; `Flux; `Static; `Chaos; `Sync; `Life; `Death;
+]
+
+let all_attributes = [ `Might; `Mettle; `Chutzpah ]
+
+let all_skills = [
+  `Enchant; `Alchemy;
+  `Melee; `Ranged
+]
+
+let all_traits = all_aspects @ all_attributes @ all_skills
 
 let get_time () : int = truncate (Unix.time ())
 

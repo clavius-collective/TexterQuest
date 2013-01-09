@@ -6,6 +6,7 @@ OCAMLPACKS[] =
 ABSTRACT_FILES[] =
 	types
 	util
+	trait
 	actor
 	room
 	action

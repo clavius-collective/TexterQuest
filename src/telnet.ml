@@ -8,11 +8,13 @@ include Unix
 
 type user = file_descr
 
-let do_debug = ref false
-let debug s = if !do_debug then print_endline (">> " ^ s)
+let no_debug = ref false
+let debug s = if not !no_debug then print_endline (">> " ^ s)
 
 let users = Hashtbl.create 100
-let new_user = Util.generate (fun i () -> "user_" ^ (string_of_int i))
+let clients = ref []
+
+let new_user = Util.generate_str "user"
 
 let send_output sock s =
   let rec send_part = function
@@ -33,14 +35,23 @@ let send_output sock s =
         send_part s1;
         send_part s2
   in
-  send_part s; send_part (Raw "\n")
+  send_part s;
+  send_part (Raw "\n")
+
+let disconnect sock =
+  debug ((Hashtbl.find users sock) ^ " disconnected");
+  Hashtbl.remove users sock;
+  clients := Util.remove sock !clients;
+  shutdown sock SHUTDOWN_ALL
 
 let process_input sock input =
-  let output = Game.process_input (Hashtbl.find users sock) input in
-  send_output sock output
+  if Util.matches_ignore_case "quit" input then
+    disconnect sock
+  else
+    let output = Game.process_input (Hashtbl.find users sock) input in
+    send_output sock output
 
 let start () =
-  let clients = ref [] in
 
   Room.create "start" "the starting zone" [|"other", "another room"|];
   Room.create "other" "the other room" [|"start", "the first room"|];
@@ -65,10 +76,6 @@ let start () =
     ]
   in
 
-  let remove_client sock =
-    clients := List.filter (fun s -> s <> sock) !clients
-  in
-
   let handle sock =
     let max_len = 1024 in
     if sock = server then
@@ -76,14 +83,12 @@ let start () =
     else
       let buffer = String.create max_len in
       let len = recv sock buffer 0 max_len [] in
-      match len with
-        | 0 ->
-            debug ((Hashtbl.find users sock) ^ " disconnected");
-            remove_client sock
-        | _ ->
-            let input = String.sub buffer 0 len in
-            let endline = Str.regexp "\r?\n\r?" in
-            List.iter (process_input sock) (Str.split endline input)
+      if len = 0 then
+        disconnect sock
+      else
+        let input = String.sub buffer 0 len in
+        let endline = Str.regexp "\r?\n\r?" in
+        List.iter (process_input sock) (Str.split endline input)
   in
 
   while true do
@@ -94,6 +99,6 @@ let start () =
 let _ =
   Arg.parse
     [
-      "-v", Arg.Set do_debug, "verbose mode"
+      "-q", Arg.Set no_debug, "verbose mode"
     ] (fun _ -> ()) "basic MUD";
   start ()

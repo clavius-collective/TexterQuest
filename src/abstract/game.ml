@@ -12,23 +12,24 @@ let init_character = Util.generate
     let name = "player_" ^ (string_of_int i) in
     Actor.create name initial_location)
 
-let player_login p =
-  let character = init_character p in
-  Hashtbl.add players p character;
+let player_login player =
+  let character = init_character player in
+  Hashtbl.add players player character;
   let room = Actor.get_loc character in
   Room.enter character room
 
-let player_logout p =
-  Room.leave (get_character p);
-  Hashtbl.remove players p
+let player_logout player =
+  Room.leave (get_character player);
+  Hashtbl.remove players player
 
 let check actor action = true
 
-let process_input p s =
+let process_input player input =
   let open Action in
-      let act = action_of_string (get_character p) s in
-      if check (get_character p) act then
+      let character = get_character player in
+      let act = action_of_string character input in
+      if check character act then
         match act with
-          | Move i -> Room.move (get_character p) i
-          | ActionError -> Raw s
+          | Move i -> Room.move character i
+          | ActionError -> Raw input
       else Raw "INVALID COMMAND"
