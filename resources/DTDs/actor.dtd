@@ -1,0 +1,25 @@
+<!ELEMENT actor_list (actor)*>
+<!ELEMENT actor (name, title_list, trait_list, location, equipment_list,
+          item_list, currency_list)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT title_list (title)*>
+<!ELEMENT trait_list (trait)*>
+<!ELEMENT location (#PCDATA)>
+<!ELEMENT equipment_list (equipment)*>
+<!ELEMENT currency_list (currency)*>
+<!ELEMENT item_list (item)*>
+<!ELEMENT title (name, description)> <!-- I expect `name` will change. -->
+<!ELEMENT trait (#PCDATA)>
+<!ELEMENT equipment (item)>
+<!ELEMENT currency (#PCDATA)>
+<!ELEMENT item (name, description, trait_list)> <!-- Possibly effect list --
+                                -- ... potentially also a hash for which one it --
+                                -- is? -->
+
+<!-- Trait attributes -->
+<!ATTLIST trait type (aspect|attribute|skill) #REQUIRED>
+<!ATTLIST trait val CDATA #REQUIRED>
+
+<!ATTLIST currency type CDATA #REQUIRED>
+
