@@ -12,8 +12,8 @@ val action_of_string : Actor.t -> string -> t
 
 val string_of_action : t -> string
 
-(* This is one of what will be a few ways of doing things in the game; this is
-   the most basic, which does not produce any sort of output.  It will be useful
-   to have this sometimes, but generally we'll want a description of the t
-   to be generated for the player's benefit. *)
+(* This is one of what will be a few ways of doing things in the game;
+   this is the most basic, which does not produce any sort of output.
+   It will be useful to have this sometimes, but generally we'll want
+   a description of the t to be generated for the player's benefit. *)
 (* val complete_action : t -> unit *)

@@ -12,11 +12,13 @@ let init_character = Util.generate
     let name = "player_" ^ (string_of_int i) in
     Actor.create name initial_location)
 
-let player_login player =
+let player_login player = Raw ("Hello, " ^ player ^ ". Make a character? ")
+
+let player_select_character player character =
   let character = init_character player in
   Hashtbl.add players player character;
   let room = Actor.get_loc character in
-  Room.enter character room
+  Room.enter character room  
 
 let player_logout player =
   Room.leave (get_character player);

@@ -1,10 +1,10 @@
 type aspect = [
-  `Solar | `Lunar | `Astral              (* celestial *)
-| `Frost | `Bio | `Terra | `Aqua | `Aero (* natural *)
-| `Ego | `Ethos                          (* psychic *)
-| `Shadow | `Light | `Chroma             (* chromatic *)
-| `Flux | `Static | `Chaos | `Sync       (* synergistic *)
-| `Life | `Death                         (* cyclic *)
+  `Solar  | `Lunar  | `Astral                 (* celestial *)
+| `Frost  | `Bio    | `Terra  | `Aqua | `Aero (* natural *)
+| `Ego    | `Ethos                            (* psychic *)
+| `Shadow | `Light  | `Chroma                 (* chromatic *)
+| `Flux   | `Static | `Chaos  | `Sync         (* synergistic *)
+| `Life   | `Death                            (* cyclic *)
 ]
 
 type attribute = [
@@ -19,6 +19,13 @@ type skill = [
 ]
 
 type trait = [ aspect | attribute | skill ]
+
+type stat = {
+  mutable value : float;
+  mutable masks : ((int -> int) * int) list
+}
+
+type vector = (trait, stat) Hashtbl.t
 
 let all_aspects = [
   `Solar; `Lunar; `Astral; `Frost; `Bio; `Terra; `Aqua; `Aero; `Ego; `Ethos;
@@ -36,14 +43,7 @@ let all_traits = all_aspects @ all_attributes @ all_skills
 
 let get_time () : int = truncate (Unix.time ())
 
-type stat = {
-  mutable value : float;
-  mutable masks : ((int -> int) * int) list
-}
-
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }
-
-type vector = (trait, stat) Hashtbl.t
 
 let lookup vec = Hashtbl.find vec
 
@@ -71,11 +71,16 @@ let value vec trait =
 let raw_value vec trait = truncate (lookup vec trait).value
 
 let create ?(initial = []) traits =
-  let table = Hashtbl.create 100 in
+  let table = Hashtbl.create (2 * List.length all_traits + 1) in
   List.iter
     (fun k -> Hashtbl.add table k (new_stat ()))
     traits;
   table
+
+let aspect_vector ?initial () = create ?initial all_aspects
+let attribute_vector ?initial () = create ?initial all_attributes
+let skill_vector ?initial () = create ?initial all_skills
+let trait_vector ?initial () = create ?initial all_traits
 
 let check vec coeffs =
   List.fold_left
