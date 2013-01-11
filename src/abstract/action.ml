@@ -16,8 +16,6 @@ let action_of_string actor input =
 
 let string_of_action act = 
   match act with
-  (* | Move(a,r) -> (Actor.string_of_actor a) ^ " goes to " ^ (Room.string_of_room *)
-  (* r) ^ "." *)
   | Move i -> "move " ^ (string_of_int i)
   | ActionError -> "No action done."
   

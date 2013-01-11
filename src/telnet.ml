@@ -6,7 +6,11 @@
 include Types
 include Unix
 
-type user = file_descr
+type sock = file_descr
+type user =
+  | Connected
+  | CharSelect of Game.player
+  | LoggedIn of Game.player
 
 let no_debug = ref false
 let debug s = if not !no_debug then print_endline (">> " ^ s)
@@ -14,9 +18,11 @@ let debug s = if not !no_debug then print_endline (">> " ^ s)
 let users = Hashtbl.create 100
 let clients = ref []
 
-let new_user = Util.generate_str "user"
+let new_user =
+  let generator = Util.generate_str "user" in
+  generator
 
-let send_output sock s =
+let send_output ?(newline=1) sock s =
   let rec send_part = function
     | Raw s ->
         ignore (send sock s 0 (String.length s) [])
@@ -36,20 +42,47 @@ let send_output sock s =
         send_part s2
   in
   send_part s;
-  send_part (Raw "\n")
+  for i = 1 to newline do send_part (Raw "\n") done
+
+let lookup = Hashtbl.find users
+
+let get_player sock = match lookup sock with
+  | CharSelect player | LoggedIn player -> Some player
+  | Connected -> None
 
 let disconnect sock =
-  debug ((Hashtbl.find users sock) ^ " disconnected");
+  let name = match get_player sock with
+    | Some player -> player
+    | None -> "a user"
+  in
+  debug (name ^ " disconnected");
   Hashtbl.remove users sock;
   clients := Util.remove sock !clients;
   shutdown sock SHUTDOWN_ALL
+
+let check_login input =
+  let player = input in
+  Some player
 
 let process_input sock input =
   if Util.matches_ignore_case "quit" input then
     disconnect sock
   else
-    let output = Game.process_input (Hashtbl.find users sock) input in
-    send_output sock output
+    match lookup sock with
+      | Connected ->
+          (match check_login input with
+            | Some player ->
+                Hashtbl.replace users sock (CharSelect player);
+                send_output ~newline:0 sock (Game.player_login player)
+            | None -> 
+                send_output sock (Raw "Invalid username, please try again."))
+      | CharSelect player -> 
+          send_output sock (Raw "Fuck dat shit, you're in.\n");
+          Hashtbl.replace users sock (LoggedIn player);
+          send_output sock (Game.player_select_character player 0)
+      | LoggedIn player -> 
+          let output = Game.process_input player input in
+          send_output sock output
 
 let start () =
 
@@ -68,12 +101,8 @@ let start () =
   let accept_client () =
     let (sock, addr) = accept server in
     clients := sock :: !clients;
-    let player = new_user () in
-    Hashtbl.add users sock player;
-    List.iter (send_output sock) [
-      Raw "TEXTER QUEST\n";
-      Game.player_login player
-    ]
+    Hashtbl.add users sock Connected;
+    send_output ~newline:0 sock (Raw "TEXTER QUEST\n\nPlease enter username: ")
   in
 
   let handle sock =
