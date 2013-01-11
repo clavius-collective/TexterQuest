@@ -1,0 +1,43 @@
+<!ELEMENT room (room_hash, zone_hash, room_exit*, property_list, actor_list,
+          item_list, description)>
+<!-- "hash" may be replaced with UUID at some point. -->
+<!-- room_exit may be changed from * to +; I can't imagine having rooms with no --
+  -- exit. -->
+
+<!ELEMENT room_hash (#PCDATA)>
+<!-- Probably a UUID, which would result in the name changing to _uuid. -->
+<!ELEMENT zone_hash (#PCDATA)>
+<!-- Likewise a UUID, same considerations exist. Zones will be used for block --
+  -- loading and effect management. -->
+<!ELEMENT room_exit (room_hash)>
+<!-- room_exit may in future also contain information on accessing the path --
+  -- between rooms.  This would require either <!ATTLIST> or additional child --
+  -- nodes to be added to the structure. -->
+<!ELEMENT property_list (property)*>
+
+<!ELEMENT actor_list (actor_elem)*>
+
+<!ELEMENT item_list (item_elem)*>
+
+<!ELEMENT description (#PCDATA)>
+
+<!ELEMENT property (#PCDATA)>
+<!-- Properties are currently just values with ATTLIST items to note what type --
+  -- they are; there's probably a good reason to split it polymorphically at --
+  -- some point, where it will have a value element and a property_class --
+  -- element.-->
+<!ELEMENT actor_elem (actor_hash, location)>
+
+<!ELEMENT item_elem (item_hash, location)>
+<!-- This assumes items are standardized across the system.  We'll figure that --
+  -- out. -->
+
+<!ELEMENT actor_hash (#PCDATA)>
+<!ELEMENT item_hash (#PCDATA)>
+<!ELEMENT location (#PCDATA)>
+<!-- Location does not differentiate if an item is on the floor, a bookshelf, or --
+  -- anything.  That will need to be captured in description at this point. -->
+
+<!ATTLIST property type CDATA #REQUIRED>
+<!-- This will become an enumerated type at some point.  I'll change the DTD at --
+  -- that time. -->

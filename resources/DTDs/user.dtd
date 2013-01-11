@@ -1,0 +1,19 @@
+<!ELEMENT user (user_hash, user_name, actor_list)>
+
+<!ELEMENT user_hash (#PCDATA)>
+<!-- Some form of UUID to identify players internally. -->
+
+<!ELEMENT user_name (#PCDATA)>
+<!-- A more human-readable sort of thing. -->
+
+<!ELEMENT actor_list (actor_hash)*>
+<!-- Actor hashes are only used because the actors will probably be stored in --
+  -- other files, but hashes can be used to identify which files to  load. --
+  -- Potentially the filesystem will also be used for this; restricting players --
+  -- to their personal folders to try to maintain a level of security. -->
+
+<!ELEMENT preference_list (preference)*>
+<!ELEMENT preference (#PCDATA)>
+<!ATTLIST preference type CDATA #REQUIRED>
+<!-- For now, preference type will be CDATA, with code to handle malformed --
+  -- preferences. -->

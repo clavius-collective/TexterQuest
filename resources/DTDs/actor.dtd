@@ -23,3 +23,5 @@
 
 <!ATTLIST currency type CDATA #REQUIRED>
 
+<!ATTLIST equipment equip_point #REQUIRED>
+
