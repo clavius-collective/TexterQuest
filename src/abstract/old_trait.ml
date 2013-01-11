@@ -66,8 +66,8 @@ let add_experience actor trait quantity =
   (* Get the value of the trait out of the correct hashmap. *)
   (* Find the current step size *)
   (* Compute if there is an overflow to the next level.
-   * - If so, add as much as necessary to overflow, then recompute step size and
-   *   repeat the procedure for the new level.
+   * - If so, add as much as necessary to overflow, then recompute step size
+   *   and repeat the procedure for the new level.
    * - If not, add to current value.
    * Write the new value to the hashmap for the same trait.
    *)

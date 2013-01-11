@@ -8,17 +8,30 @@ type aspect = [
 ]
 
 type attribute = [
-  `Might
+  `Hardiness
+| `Might
 | `Mettle
-| `Chutzpah
+| `Finesse
+| `Agility
+| `Stability
+| `Resilience
+| `Dedication
+| `Concentration
+| `Intuition
+| `Clarity
 ]
 
 type skill = [
   `Enchant | `Alchemy                   (* magic *)
-| `Melee | `Ranged                      (* weapon *)
+| `Melee   | `Ranged                    (* weapon *)
 ]
 
 type trait = [ aspect | attribute | skill ]
+
+val all_aspects : aspect list
+val all_attributes : attribute list
+val all_skills : skill list
+val all_traits : trait list
 
 type vector
 
@@ -29,3 +42,5 @@ val aspect_vector : ?initial : (aspect * float) list -> unit -> vector
 val attribute_vector : ?initial : (attribute * float) list -> unit -> vector
 val skill_vector : ?initial : (skill * float) list -> unit -> vector
 val trait_vector : ?initial : (trait * float) list -> unit -> vector
+
+val add_vectors : vector -> vector -> (trait * int) list

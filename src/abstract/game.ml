@@ -1,7 +1,5 @@
 include Types
 
-type player = string
-
 let players = Hashtbl.create 100
 
 let get_character = Hashtbl.find players

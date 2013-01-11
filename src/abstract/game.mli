@@ -1,7 +1,6 @@
 open Types
 
-type player = string
-val process_input : player -> string -> fstring
-val player_login : player -> fstring
-val player_select_character : player -> int -> fstring
-val player_logout : player -> unit
+val process_input : username -> string -> fstring
+val player_login : username -> fstring
+val player_select_character : username -> int -> fstring
+val player_logout : username -> unit

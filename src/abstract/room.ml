@@ -30,14 +30,14 @@ let list_actors id =
     | l -> (String.concat ", " (List.map Actor.get_name l)) ^ " are here")
 
 let list_exits id =
-  Raw (
-    "Exits are: " ^
-      (String.concat ", "
-         (Array.to_list
-            (Array.mapi
-               (fun i (_, s) -> "(" ^ (string_of_int (i + 1)) ^ ") " ^ s)
-               (get id).exits))))
-
+  Raw
+    ("Exits are: " ^
+        (String.concat ", "
+           (Array.to_list
+              (Array.mapi
+                 (fun i (_, s) -> "(" ^ (string_of_int (i + 1)) ^ ") " ^ s)
+                 (get id).exits))))
+    
 let describe id =
   Concat
     (Raw ((get id).description ^ "\n"),

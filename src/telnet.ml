@@ -6,11 +6,7 @@
 include Types
 include Unix
 
-type sock = file_descr
-type user =
-  | Connected
-  | CharSelect of Game.player
-  | LoggedIn of Game.player
+type client = file_descr
 
 let no_debug = ref false
 let debug s = if not !no_debug then print_endline (">> " ^ s)
