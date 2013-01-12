@@ -1,5 +1,5 @@
 (* Copyright (C) 2013 Ben Lewis and David Donna *)
-(* Action.mli, part of TexterQuest *)
+(* action.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
 type t =

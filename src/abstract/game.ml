@@ -1,3 +1,7 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* game.ml, part of TexterQuest *)
+(* LGPLv3 *)
+
 include Types
 
 let players = Hashtbl.create 100

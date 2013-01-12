@@ -1,3 +1,7 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* game.mli, part of TexterQuest *)
+(* LGPLv3 *)
+
 open Types
 
 val process_input : username -> string -> fstring
