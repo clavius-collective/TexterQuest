@@ -1,6 +1,8 @@
-include Types
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* game.ml, part of TexterQuest *)
+(* LGPLv3 *)
 
-type player = string
+include Types
 
 let players = Hashtbl.create 100
 

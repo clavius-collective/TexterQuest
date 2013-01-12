@@ -1,16 +1,13 @@
 (* Copyright (C) 2013 Ben Lewis and David Donna *)
-(* Licensed under LGPLv3 *)
+(* telnet.ml, part of TexterQuest *)
+(* LGPLv3 *)
 
 (* This produces an executable that will run a telnet server for the game. *)
 
 include Types
 include Unix
 
-type sock = file_descr
-type user =
-  | Connected
-  | CharSelect of Game.player
-  | LoggedIn of Game.player
+type client = file_descr
 
 let no_debug = ref false
 let debug s = if not !no_debug then print_endline (">> " ^ s)
@@ -30,16 +27,13 @@ let send_output ?(newline=1) sock s =
         send_part s
     | Sections fstrings ->
         List.iter
-          (fun s -> send_part (Concat (s, Raw "\n\n")))
+          (fun s -> send_part (Concat [s; Raw "\n\n"]))
           fstrings
-    | List fstrings ->
+    | Concat fstrings ->
         List.iter
           (fun s ->
-            send_part (Concat (Raw "* ", Concat (s, Raw "\n"))))
+            send_part (Concat [Raw "* "; s; Raw "\n"]))
           fstrings
-    | Concat (s1, s2) ->
-        send_part s1;
-        send_part s2
   in
   send_part s;
   for i = 1 to newline do send_part (Raw "\n") done

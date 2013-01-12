@@ -1,3 +1,7 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* room.ml, part of TexterQuest *)
+(* LGPLv3 *)
+
 include Types
 
 type room = {
@@ -30,18 +34,18 @@ let list_actors id =
     | l -> (String.concat ", " (List.map Actor.get_name l)) ^ " are here")
 
 let list_exits id =
-  Raw (
-    "Exits are: " ^
-      (String.concat ", "
-         (Array.to_list
-            (Array.mapi
-               (fun i (_, s) -> "(" ^ (string_of_int (i + 1)) ^ ") " ^ s)
-               (get id).exits))))
-
+  Raw ("Exits are: " ^
+          (String.concat ", "
+             (Array.to_list
+                (Array.mapi
+                   (fun i (_, s) -> "(" ^ (string_of_int (i + 1)) ^ ") " ^ s)
+                   (get id).exits))))
+    
 let describe id =
-  Concat
-    (Raw ((get id).description ^ "\n"),
-     List [list_actors id; list_exits id])
+  Concat [
+    Raw ((get id).description ^ "\n");
+    Concat [list_actors id; list_exits id]
+  ]
 
 let leave actor =
   let id = Actor.get_loc actor in

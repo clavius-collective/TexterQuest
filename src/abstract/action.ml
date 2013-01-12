@@ -1,5 +1,5 @@
 (* Copyright (C) 2013 Ben Lewis and David Donna *)
-(* Action.ml, part of TexterQuest *)
+(* action.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
 include Types
