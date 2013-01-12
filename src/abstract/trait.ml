@@ -56,7 +56,7 @@ let get_time () = truncate (Unix.time ())
 
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }
 
-let lookup vec trait = List.assoc trait vec
+let lookup vec trait = try List.assoc trait vec with Not_found -> new_stat ()
 
 let mask vec trait func duration =
   let stat = (lookup vec trait) in
@@ -79,6 +79,7 @@ let stat_value stat =
   final_val
 
 let value vec trait = stat_value (lookup vec trait)
+let all_values vec = List.map (fun (t, v) -> t, stat_value v) vec
 
 let raw_value vec trait = truncate (lookup vec trait).value
 
@@ -91,24 +92,23 @@ let attribute_vector ?initial () = create ?initial all_attributes
 let skill_vector ?initial () = create ?initial all_skills
 let trait_vector ?initial () = create ?initial all_traits
 
+(* coefficient vectors can be appended!
+   e.g. enchant = self @ static @ [`Enchant] *)
 let check vec coeffs =
-  List.fold_left
-    (fun total (trait, coeff) -> total +. (float (lookup vec trait) *. coeff))
-    0.0
-    coeffs
+  let add total (trait, coeff) = total +. (float (value vec trait) *. coeff) in
+  truncate (List.fold_left add 0.0 coeffs)
 
-let add_vectors left right =
-  let rec find acc left right = match left with
+let combine_vectors vectors =
+  let rec combine_pair acc left right = match left with
     | [] ->
-        acc @ List.map (fun (t, s) -> t, stat_value s) right
-    | (trait, stat)::left_rem ->
-        let total_stat, right_rem = 
+        acc @ right
+    | (trait, value)::left_rem ->
+        let total, right_rem = 
           try
-            stat_value stat + stat_value (List.assoc trait right),
-            List.remove_assoc trait right
+            value + List.assoc trait right, List.remove_assoc trait right
           with
-            | Not_found -> stat_value stat, right
+            | Not_found -> value, right
         in
-        find ((trait, total_stat)::acc) left_rem right_rem
+        combine_pair ((trait, total)::acc) left_rem right_rem
   in
-  find [] left right
+  List.fold_left (combine_pair []) [] (List.map all_values vectors)
