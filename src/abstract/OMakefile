@@ -6,13 +6,15 @@ OCAMLPACKS[] =
 ABSTRACT_FILES[] =
 	types
 	util
+	mask
 	trait
+	wound
 	actor
 	room
 	action
 	game
 
-OCamlLibrary(libabstract, $(ABSTRACT_FILES))
+.DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))
 
 clean:
 	rm *.c* *.o* libabstract*

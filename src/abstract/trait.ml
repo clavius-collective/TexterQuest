@@ -1,3 +1,7 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* trait.ml, part of TexterQuest *)
+(* LGPLv3 *)
+
 type aspect = [
   `Solar  | `Lunar  | `Astral                 (* celestial *)
 | `Frost  | `Bio    | `Terra  | `Aqua | `Aero (* natural *)
@@ -52,39 +56,33 @@ let all_skills = [
 
 let all_traits = all_aspects @ all_attributes @ all_skills
 
-let get_time () = truncate (Unix.time ())
+module StatMask = Mask.Masker(struct
+  type acc = int
+  type t = stat
+  let get_base t = truncate t.value
+  let get_masks t = t.masks
+  let set_masks t m = t.masks <- m
+end)
 
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }
 
-let lookup vec trait = try List.assoc trait vec with Not_found -> new_stat ()
+let lookup vec trait =
+  try List.assoc trait vec
+  with Not_found -> new_stat ()
 
 let mask vec trait func duration =
   let stat = (lookup vec trait) in
-  let expire = duration + get_time () in
-  stat.masks <- (func, expire)::stat.masks
-
-let stat_value stat =
-  let time = get_time () in
-  let final_val, masks =
-    List.fold_right
-      (fun ((func, expire) as mask) (total, active) ->
-        if expire > time then
-          func(total), mask::active
-        else
-          total, active)
-      stat.masks
-      (truncate stat.value, [])
-  in
-  stat.masks <- masks;
-  final_val
-
-let value vec trait = stat_value (lookup vec trait)
-let all_values vec = List.map (fun (t, v) -> t, stat_value v) vec
+  StatMask.add_mask stat func duration
 
 let raw_value vec trait = truncate (lookup vec trait).value
+let value vec trait = StatMask.get_value (lookup vec trait)
+let all_values vec = List.map (fun (t, v) -> t, StatMask.get_value v) vec
 
 let create ?(initial = []) traits =
-  let init t = try List.assoc t initial with | Not_found -> 0.0 in
+  let init t = 
+    try List.assoc t initial
+    with Not_found -> 0.0
+  in
   List.map (fun t -> t, new_stat ~value:(init t) ()) traits
 
 let aspect_vector ?initial () = create ?initial all_aspects
@@ -92,8 +90,6 @@ let attribute_vector ?initial () = create ?initial all_attributes
 let skill_vector ?initial () = create ?initial all_skills
 let trait_vector ?initial () = create ?initial all_traits
 
-(* coefficient vectors can be appended!
-   e.g. enchant = self @ static @ [`Enchant] *)
 let check vec coeffs =
   let add total (trait, coeff) = total +. (float (value vec trait) *. coeff) in
   truncate (List.fold_left add 0.0 coeffs)

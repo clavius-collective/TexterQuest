@@ -26,17 +26,29 @@ let send_output ?(newline=1) sock s =
     | Bold s | Italic s | Underline s | Color (_, s) ->
         send_part s
     | Sections fstrings ->
-        List.iter
-          (fun s -> send_part (Concat [s; Raw "\n\n"]))
-          fstrings
+        let rec send_sections = function
+          | [] -> ()
+          | [x] -> send_part s
+          | x::xs ->
+              send_part (Concat [s; Raw "\n\n"]);
+              send_sections xs
+        in
+        send_sections fstrings
     | Concat fstrings ->
-        List.iter
-          (fun s ->
-            send_part (Concat [Raw "* "; s; Raw "\n"]))
-          fstrings
+        let send_point s = send_part (Concat [Raw "* "; s]) in
+        let rec send_list = function
+          | [] -> ()
+          | [x] ->
+              send_point x;
+          | x::xs ->
+              send_point x;
+              send_part (Raw "\n");
+              send_list xs
+        in
+        send_list fstrings
   in
   send_part s;
-  for i = 1 to newline do send_part (Raw "\n") done
+  send_part (Raw "\n>>> ")
 
 let lookup = Hashtbl.find users
 
@@ -79,7 +91,6 @@ let process_input sock input =
           send_output sock output
 
 let start () =
-
   Room.create "start" "the starting zone" [|"other", "another room"|];
   Room.create "other" "the other room" [|"start", "the first room"|];
 
@@ -96,7 +107,7 @@ let start () =
     let (sock, addr) = accept server in
     clients := sock :: !clients;
     Hashtbl.add users sock Connected;
-    send_output ~newline:0 sock (Raw "TEXTER QUEST\n\nPlease enter username: ")
+    send_output ~newline:0 sock (Raw "TEXTER QUEST\n\nPlease enter username")
   in
 
   let handle sock =
@@ -122,6 +133,6 @@ let start () =
 let _ =
   Arg.parse
     [
-      "-q", Arg.Set no_debug, "verbose mode"
-    ] (fun _ -> ()) "basic MUD";
+      "-q", Arg.Set no_debug, "quiet mode"
+    ] (fun _ -> ()) "TelnetsterQuest!";
   start ()

@@ -19,8 +19,7 @@ OCAML_OTHER_LIBS[] =
 FILES[] =
 	telnet
 
-OCamlProgram($(PROGRAM), $(FILES))
-.DEFAULT: $(PROGRAM)
+.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
 
 clean:
 	rm *.c* *.o* $(PROGRAM)*

@@ -1,12 +1,16 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* trait.mli, part of TexterQuest *)
+(* LGPLv3 *)
+
 open Types
 
 type aspect = [
-  `Solar  | `Lunar  | `Astral                 (* celestial                 *)
-| `Frost  | `Bio    | `Terra  | `Aqua | `Aero (* natural                   *)
-| `Ego    | `Ethos                            (* psychic                   *)
-| `Shadow | `Light  | `Chroma                 (* chromatic                 *)
-| `Flux   | `Static | `Chaos  | `Sync         (* synergistic               *)
-| `Life   | `Death                            (* cyclic                    *)
+  `Solar  | `Lunar  | `Astral                 (* celestial                   *)
+| `Frost  | `Bio    | `Terra  | `Aqua | `Aero (* natural                     *)
+| `Ego    | `Ethos                            (* psychic                     *)
+| `Shadow | `Light  | `Chroma                 (* chromatic                   *)
+| `Flux   | `Static | `Chaos  | `Sync         (* synergistic                 *)
+| `Life   | `Death                            (* cyclic                      *)
 ]
 
 type attribute = [
@@ -24,15 +28,15 @@ type attribute = [
 ]
 
 type skill = [
-  `Enchant | `Alchemy                         (* magic                     *)
-| `Melee   | `Ranged                          (* weapon                    *)
+  `Enchant | `Alchemy                         (* magic                       *)
+| `Melee   | `Ranged                          (* weapon                      *)
 ]
 
-(* BOOM polymorphism motherfuckers                                         *)
+(* BOOM polymorphism motherfuckers                                           *)
 type trait = [ aspect | attribute | skill ]
 
 (*
- * lists of every value of the given type
+ * List every value of the type in question.
  * 
  * NOTE: these will need to be changed manually if the types are extended
  *)
@@ -52,18 +56,18 @@ val all_traits     : trait list
  *)
 type vector
 
-(* Temporarily modify the value of a trait.                                *)
+(* Temporarily modify the value of a trait.                                  *)
 val mask :
-  vector       ->       (* the traits of the object in question            *)
-  trait        ->       (* the id of the trait getting masked              *)
-  (int -> int) ->       (* the effect (e.g. (+) 2 to increase by 2)        *)
-  int          ->       (* the duration, in seconds, of the mask           *)
+  vector       ->       (* the traits of the object in question              *)
+  trait        ->       (* the id of the trait getting masked                *)
+  (int -> int) ->       (* the effect (e.g. (+) 2 to increase by 2)          *)
+  int          ->       (* the duration, in seconds, of the mask             *)
   unit
 
-(* Look up the "visible" value of the trait for a given object's vector.   *)
+(* Look up the "visible" value of the trait for a given object's vector.     *)
 val value : vector -> trait -> int
 
-(* Return a list of the visible values of each trait in the vector.        *)
+(* Return a list of the visible values of each trait in the vector.          *)
 val all_values : vector -> (trait * int) list
 
 (* 
@@ -91,6 +95,6 @@ val combine_vectors : vector list -> (trait * int) list
  * the sum of those coefficients.
  *)
 val check : 
-  vector               ->               (* standard-issue stat vector      *)
-  (trait * float) list ->               (* coefficients for trait check    *)
-  int                                   (* truncate result (deterministic) *)
+  vector               ->               (* standard-issue stat vector        *)
+  (trait * float) list ->               (* coefficients for trait check      *)
+  int                                   (* truncate result (deterministic)   *)
