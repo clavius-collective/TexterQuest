@@ -29,7 +29,7 @@ let check (severity, expire) =
       | Middling   -> Some (new_wound Minor)
       | Mortifying -> Some (new_wound Middling)
 
-let add_wound ?duration t severity =
+let add_wound t ?duration severity =
   t := (new_wound ?duration severity)::!t
 
 let total_wounds t =
