@@ -1,3 +1,5 @@
+let get_time () = truncate (Unix.time ())
+
 let generate f =
   let _counter = ref 0 in
   fun x ->

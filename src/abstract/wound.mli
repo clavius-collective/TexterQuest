@@ -9,18 +9,16 @@ type severity =
   | Mortifying
 
 (* the object that tracks a given actor's wounds                             *)
-type wounds
+type t
 
-val create : unit -> wounds
+val create : unit -> t
 
 (* adds a wound                                                              *)
 val add_wound : 
-  wounds ->                             (* the actor's current wounds        *)
-  severity ->                           (* the severity of the new wound     *)
-  int ->                                (* the new wound's duration          *)
+  ?duration : int ->  (* the duration of the wound                           *)
+  t               ->  (* the actor's current wounds                          *)
+  severity        ->  (* the severity of the new wound                       *)
   unit
 
-val total_wounds :
-  wounds ->
-  (int * int * int)                     (* the total numbers of wounds, in
-                                           increasing order of severity      *)
+(* return the total number of wounds at each degree of severity *)
+val total_wounds : t -> (int * int * int)

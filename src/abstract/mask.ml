@@ -2,8 +2,6 @@
 (* mask.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-let get_time () = truncate (Unix.time ())
-
 type 'a mask = ('a -> 'a) * int
 
 module Masker = functor (M : sig
@@ -15,11 +13,11 @@ module Masker = functor (M : sig
 end) -> struct
 
   let add_mask t func duration =
-    let expire = duration + get_time () in
+    let expire = duration + Util.get_time () in
     M.set_masks t ((func, expire)::(M.get_masks t))
 
   let get_value t =
-    let time = get_time () in
+    let time = Util.get_time () in
     let final_val, active =
       List.fold_right
         (fun ((func, expire) as mask) (total, active) ->

@@ -1,3 +1,6 @@
+(* return an int representing the current time *)
+val get_time : unit -> int
+
 (* supply a counter that will be incremented each time f is called *)
 val generate : (int -> 'a -> 'b) -> 'a -> 'b
 
