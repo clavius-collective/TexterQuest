@@ -26,3 +26,5 @@ val set_loc : t -> room_id -> unit
 val add_wound : t -> ?duration:int -> Wound.severity -> unit
 
 val defeated : t -> bool
+
+val describe : t -> fstring

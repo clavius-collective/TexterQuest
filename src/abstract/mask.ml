@@ -2,7 +2,7 @@
 (* mask.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-type 'a mask = ('a -> 'a) * int
+include Types
 
 module Masker = functor (M : sig
   type t
@@ -12,7 +12,7 @@ module Masker = functor (M : sig
   val set_masks : t -> acc mask list -> unit
 end) -> struct
 
-  let add_mask t func duration =
+  let add_mask t (func, duration) =
     let expire = duration + Util.get_time () in
     M.set_masks t ((func, expire)::(M.get_masks t))
 

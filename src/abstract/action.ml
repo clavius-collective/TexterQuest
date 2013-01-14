@@ -6,18 +6,20 @@ include Types
 
 type t =
   | Move of int
+  | Cast of string
   | ActionError
 
 let action_of_string actor input = 
-  match Str.split (Str.regexp "[., \t]+") input with
-    | "move"::i::_
-    | "go"::i::_ -> Move (int_of_string i)
+  match Str.bounded_split (Str.regexp "[., \t]+") input 2 with
+    | ["go"; i] -> Move (int_of_string i)
+    (* For spell:
+     * extract target designation
+     * get spell, translate to syllable list
+    *)
     | _ -> ActionError
 
 let string_of_action act = 
   match act with
   | Move i -> "move " ^ (string_of_int i)
+  | Cast spell_and_target -> "cast " ^ spell_and_target
   | ActionError -> "No action done."
-  
-(* There will need to be lists of synonyms for actions; this part will get
-  quite complex. *)

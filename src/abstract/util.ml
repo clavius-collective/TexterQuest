@@ -17,3 +17,7 @@ let matches_ignore_case pattern string =
       string_match re string 0
 
 let remove item = List.filter (fun x -> x <> item)
+
+let (<=) list_ref elt = list_ref := elt :: !list_ref
+
+let split = Str.split (Str.regexp "[ \t]+")

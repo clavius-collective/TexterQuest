@@ -15,3 +15,9 @@ val remove : 'a -> 'a list -> 'a list
   
 (* like = but cooler *)
 val matches_ignore_case : string -> string -> bool
+
+(* list ref append *)
+val (<=) : 'a list ref -> 'a -> unit
+
+(* whitespace split *)
+val split : string -> string list

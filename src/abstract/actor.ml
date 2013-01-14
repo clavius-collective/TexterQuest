@@ -32,11 +32,11 @@ let create_new = create
   ~traits:(Trait.create_traits ())
   ~location:initial_location
 
-let get_name actor = actor.name
+let get_name t = t.name
 
-let get_loc actor = actor.location
+let get_loc t = t.location
 
-let set_loc actor room_id = actor.location <- room_id
+let set_loc t room_id = t.location <- room_id
 
 let add_wound t = Wound.add_wound t.wounds
 
@@ -50,3 +50,5 @@ let defeated t =
   sum > 2
 
 let send t = t.send
+
+let describe t = Raw (t.name)

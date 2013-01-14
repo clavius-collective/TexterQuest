@@ -60,8 +60,7 @@ type vector
 val mask :
   vector       ->       (* the traits of the object in question              *)
   trait        ->       (* the id of the trait getting masked                *)
-  (int -> int) ->       (* the effect (e.g. (+) 2 to increase by 2)          *)
-  int          ->       (* the duration, in seconds, of the mask             *)
+  int mask     ->       (* the effect (e.g. (+) 2 to increase by 2)          *)
   unit
 
 (* Look up the "visible" value of the trait for a given object's vector.     *)

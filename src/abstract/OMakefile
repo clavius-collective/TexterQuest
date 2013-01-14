@@ -9,8 +9,11 @@ ABSTRACT_FILES[] =
 	mask
 	trait
 	wound
+	item
 	actor
 	room
+	object
+	spell
 	action
 	game
 

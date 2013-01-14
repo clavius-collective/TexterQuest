@@ -43,7 +43,8 @@ let send_output sock s =
 let lookup = Hashtbl.find users
 
 let get_player sock = match lookup sock with
-  | CharSelect player | LoggedIn player -> Some player
+  | CharSelect player 
+  | LoggedIn player -> Some player
   | Connected -> None
 
 let disconnect sock =
@@ -61,13 +62,14 @@ let check_login input =
   Some player
 
 let process_input sock input =
-  if Util.matches_ignore_case "quit" input then
+  if Util.matches_ignore_case "quit" input or input.[0] = Char.chr 4 then
     disconnect sock
   else
     match lookup sock with
       | Connected ->
           (match check_login input with
             | Some player ->
+                debug (player ^ " logged in");
                 Hashtbl.replace users sock (CharSelect player);
                 send_output sock (Game.player_login player)
             | None -> 
@@ -93,7 +95,7 @@ let start () =
   in
 
   let accept_client () =
-    let (sock, addr) = accept server in
+    let sock, addr = accept server in
     clients := sock :: !clients;
     Hashtbl.add users sock Connected;
     send_output sock (Raw "\nTEXTER QUEST\n\nPlease enter username")
@@ -114,9 +116,12 @@ let start () =
         List.iter (process_input sock) (Str.split endline input)
   in
 
+  let handle_exception = disconnect in
+
   while true do
-    let input, _, _ = select (server::!clients) [] [] (-1.0) in
-    List.iter handle input
+    let input, _, exceptions = select (server::!clients) [] [] (-1.0) in
+    List.iter handle input;
+    List.iter handle_exception exceptions
   done
 
 let _ =

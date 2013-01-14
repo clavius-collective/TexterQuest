@@ -2,6 +2,8 @@
 (* types.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
+type 'a mask = ('a -> 'a) * int
+
 (* fundamental data types *)
 type room_id = string
 

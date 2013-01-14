@@ -34,5 +34,6 @@ let process_input player input =
       if check character act then
         (Actor.send character) (match act with
           | Move i -> Room.move character i
+          | Cast spell -> Raw input
           | ActionError -> Raw input)
       else (Actor.send character) (Raw "INVALID COMMAND")

@@ -51,7 +51,7 @@ let describe id =
 let leave actor =
   let id = Actor.get_loc actor in
   let rm = get id in
-  rm.actors <- List.filter (fun a -> a <> actor) rm.actors
+  rm.actors <- List.filter (fun a -> a != actor) rm.actors
 
 let enter actor id =
   let rm = get id in

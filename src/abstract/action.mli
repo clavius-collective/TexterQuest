@@ -4,6 +4,7 @@
 
 type t =
   | Move of int
+  | Cast of string
   | ActionError
 
 (* These are two fairly straightforward functions; the second in particular for

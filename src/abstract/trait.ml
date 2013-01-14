@@ -70,9 +70,9 @@ let lookup vec trait =
   try List.assoc trait vec
   with Not_found -> new_stat ()
 
-let mask vec trait func duration =
+let mask vec trait mask =
   let stat = (lookup vec trait) in
-  StatMask.add_mask stat func duration
+  StatMask.add_mask stat mask
 
 let raw_value vec trait = truncate (lookup vec trait).value
 let get_value vec trait = StatMask.get_value (lookup vec trait)
