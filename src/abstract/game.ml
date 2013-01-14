@@ -8,19 +8,18 @@ let players = Hashtbl.create 100
 
 let get_character = Hashtbl.find players
 
-let init_character = Util.generate
+let init_character send = Util.generate
   (fun i player ->
-    let initial_location = "start" in
     let name = "player_" ^ (string_of_int i) in
-    Actor.create name initial_location)
+    Actor.create_new ~send name)
 
-let player_login player = Raw ("Hello, " ^ player ^ ". Make a character? ")
+let player_login player = Raw ("Hello, " ^ player ^ ". Make a character?")
 
-let player_select_character player character =
-  let character = init_character player in
+let player_select_character send player character =
+  let character = init_character send player in
   Hashtbl.add players player character;
   let room = Actor.get_loc character in
-  Room.enter character room  
+  send (Room.enter character room)
 
 let player_logout player =
   Room.leave (get_character player);
@@ -33,7 +32,7 @@ let process_input player input =
       let character = get_character player in
       let act = action_of_string character input in
       if check character act then
-        match act with
+        (Actor.send character) (match act with
           | Move i -> Room.move character i
-          | ActionError -> Raw input
-      else Raw "INVALID COMMAND"
+          | ActionError -> Raw input)
+      else (Actor.send character) (Raw "INVALID COMMAND")

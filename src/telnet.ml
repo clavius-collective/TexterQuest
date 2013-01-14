@@ -19,7 +19,7 @@ let new_user =
   let generator = Util.generate_str "user" in
   generator
 
-let send_output ?(newline=1) sock s =
+let send_output sock s =
   let rec send_part = function
     | Raw s ->
         ignore (send sock s 0 (String.length s) [])
@@ -28,24 +28,14 @@ let send_output ?(newline=1) sock s =
     | Sections fstrings ->
         let rec send_sections = function
           | [] -> ()
-          | [x] -> send_part s
+          | [x] -> send_part x
           | x::xs ->
-              send_part (Concat [s; Raw "\n\n"]);
+              send_part (Concat [x; Raw "\n\n"]);
               send_sections xs
         in
         send_sections fstrings
     | Concat fstrings ->
-        let send_point s = send_part (Concat [Raw "* "; s]) in
-        let rec send_list = function
-          | [] -> ()
-          | [x] ->
-              send_point x;
-          | x::xs ->
-              send_point x;
-              send_part (Raw "\n");
-              send_list xs
-        in
-        send_list fstrings
+        List.iter send_part fstrings
   in
   send_part s;
   send_part (Raw "\n>>> ")
@@ -79,16 +69,15 @@ let process_input sock input =
           (match check_login input with
             | Some player ->
                 Hashtbl.replace users sock (CharSelect player);
-                send_output ~newline:0 sock (Game.player_login player)
+                send_output sock (Game.player_login player)
             | None -> 
                 send_output sock (Raw "Invalid username, please try again."))
-      | CharSelect player -> 
-          send_output sock (Raw "Fuck dat shit, you're in.\n");
+      | CharSelect player ->
           Hashtbl.replace users sock (LoggedIn player);
-          send_output sock (Game.player_select_character player 0)
+          let send = (send_output sock) in
+          Game.player_select_character send player 0
       | LoggedIn player -> 
-          let output = Game.process_input player input in
-          send_output sock output
+          Game.process_input player input
 
 let start () =
   Room.create "start" "the starting zone" [|"other", "another room"|];
@@ -107,7 +96,7 @@ let start () =
     let (sock, addr) = accept server in
     clients := sock :: !clients;
     Hashtbl.add users sock Connected;
-    send_output ~newline:0 sock (Raw "TEXTER QUEST\n\nPlease enter username")
+    send_output sock (Raw "\nTEXTER QUEST\n\nPlease enter username")
   in
 
   let handle sock =

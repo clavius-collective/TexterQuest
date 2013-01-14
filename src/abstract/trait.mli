@@ -65,7 +65,7 @@ val mask :
   unit
 
 (* Look up the "visible" value of the trait for a given object's vector.     *)
-val value : vector -> trait -> int
+val get_value : vector -> trait -> int
 
 (* Return a list of the visible values of each trait in the vector.          *)
 val all_values : vector -> (trait * int) list
@@ -76,10 +76,10 @@ val all_values : vector -> (trait * int) list
  * ~initial argument will have their stat initialized to those values. It is
  * safe to provide a partial list of initial values.
  *)
-val aspect_vector    : ?initial : (aspect    * float) list -> unit -> vector
-val attribute_vector : ?initial : (attribute * float) list -> unit -> vector
-val skill_vector     : ?initial : (skill     * float) list -> unit -> vector
-val trait_vector     : ?initial : (trait     * float) list -> unit -> vector
+val create_aspects    : ?initial : (aspect    * float) list -> unit -> vector
+val create_attributes : ?initial : (attribute * float) list -> unit -> vector
+val create_skills     : ?initial : (skill     * float) list -> unit -> vector
+val create_traits     : ?initial : (trait     * float) list -> unit -> vector
 
 (* 
  * Given a list of vectors, produce a list mapping each trait present in at

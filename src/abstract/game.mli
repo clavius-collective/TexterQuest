@@ -4,7 +4,7 @@
 
 open Types
 
-val process_input : username -> string -> fstring
+val process_input : username -> string -> unit
 val player_login : username -> fstring
-val player_select_character : username -> int -> fstring
+val player_select_character : (fstring -> unit) -> username -> int -> unit
 val player_logout : username -> unit

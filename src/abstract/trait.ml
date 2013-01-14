@@ -75,7 +75,7 @@ let mask vec trait func duration =
   StatMask.add_mask stat func duration
 
 let raw_value vec trait = truncate (lookup vec trait).value
-let value vec trait = StatMask.get_value (lookup vec trait)
+let get_value vec trait = StatMask.get_value (lookup vec trait)
 let all_values vec = List.map (fun (t, v) -> t, StatMask.get_value v) vec
 
 let create ?(initial = []) traits =
@@ -85,13 +85,13 @@ let create ?(initial = []) traits =
   in
   List.map (fun t -> t, new_stat ~value:(init t) ()) traits
 
-let aspect_vector ?initial () = create ?initial all_aspects
-let attribute_vector ?initial () = create ?initial all_attributes
-let skill_vector ?initial () = create ?initial all_skills
-let trait_vector ?initial () = create ?initial all_traits
+let create_aspects ?initial () = create ?initial all_aspects
+let create_attributes ?initial () = create ?initial all_attributes
+let create_skills ?initial () = create ?initial all_skills
+let create_traits ?initial () = create ?initial all_traits
 
 let check vec coeffs =
-  let add total (trait, coeff) = total +. (float (value vec trait) *. coeff) in
+  let add total (trait, coeff) = total +. (float (get_value vec trait) *. coeff) in
   truncate (List.fold_left add 0.0 coeffs)
 
 let combine_vectors vectors =

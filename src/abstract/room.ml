@@ -42,9 +42,10 @@ let list_exits id =
                    (get id).exits))))
     
 let describe id =
-  Concat [
-    Raw ((get id).description ^ "\n");
-    Concat [list_actors id; list_exits id]
+  Sections [
+    Raw (get id).description;
+    list_actors id;
+    list_exits id;
   ]
 
 let leave actor =
