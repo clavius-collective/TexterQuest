@@ -2,7 +2,7 @@
 (* game.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
-open Types
+open Util
 
 val process_input : username -> string -> unit
 val player_login : username -> fstring

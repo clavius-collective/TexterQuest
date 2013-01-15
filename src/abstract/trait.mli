@@ -2,7 +2,7 @@
 (* trait.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
-open Types
+open Util
 
 type aspect = [
   `Solar  | `Lunar  | `Astral                 (* celestial                   *)

@@ -2,13 +2,13 @@
 (* game.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-include Types
+include Util
 
 let players = Hashtbl.create 100
 
 let get_character = Hashtbl.find players
 
-let init_character send = Util.generate
+let init_character send = generate
   (fun i player ->
     let name = "player_" ^ (string_of_int i) in
     Actor.create_new ~send name)

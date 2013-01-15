@@ -2,7 +2,7 @@
 (* object.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
-open Types
+open Util
 
 type t =
   | OActor of Actor.t

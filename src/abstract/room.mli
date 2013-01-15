@@ -6,7 +6,7 @@
  * NOTA BENE: THIS SHIT IS STATEFUL
  *)
 
-open Types 
+open Util 
 
 (*
  * This function does not return a room; it ADDS A ROOM to the module's

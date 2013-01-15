@@ -2,7 +2,7 @@
 (* object.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-include Types
+include Util
 
 type t =
   | OActor of Actor.t

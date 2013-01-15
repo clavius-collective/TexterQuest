@@ -2,7 +2,7 @@
 (* spell.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-open Types
+open Util
 
 type t = Item
 

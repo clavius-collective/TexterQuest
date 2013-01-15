@@ -4,7 +4,6 @@ OCAMLPACKS[] =
 	 str
 
 ABSTRACT_FILES[] =
-	types
 	util
 	mask
 	trait

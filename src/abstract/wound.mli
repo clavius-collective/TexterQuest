@@ -17,6 +17,7 @@ val create : unit -> t
 val add_wound : 
   t             ->                 (* the actor's current wounds             *)
   ?duration:int ->                 (* the duration of the wound              *)
+  ?discount:int ->                 (* reduction in the duration of the wound *)
   severity      ->                 (* the severity of the new wound          *)
   unit
 

@@ -4,20 +4,15 @@
 
 (* This produces an executable that will run a telnet server for the game. *)
 
-include Types
+include Util
 include Unix
 
 type client = file_descr
 
-let no_debug = ref false
-let debug s = if not !no_debug then print_endline (">> " ^ s)
-
 let users = Hashtbl.create 100
 let clients = ref []
 
-let new_user =
-  let generator = Util.generate_str "user" in
-  generator
+let new_user = generate_str "user"
 
 let send_output sock s =
   let rec send_part = function
@@ -54,7 +49,7 @@ let disconnect sock =
   in
   debug (name ^ " disconnected");
   Hashtbl.remove users sock;
-  clients := Util.remove sock !clients;
+  clients := remove sock !clients;
   shutdown sock SHUTDOWN_ALL
 
 let check_login input =
@@ -62,7 +57,7 @@ let check_login input =
   Some player
 
 let process_input sock input =
-  if Util.matches_ignore_case "quit" input or input.[0] = Char.chr 4 then
+  if matches_ignore_case "quit" input or input.[0] = Char.chr 4 then
     disconnect sock
   else
     match lookup sock with
@@ -96,7 +91,7 @@ let start () =
 
   let accept_client () =
     let sock, addr = accept server in
-    clients := sock :: !clients;
+    sock >> clients;
     Hashtbl.add users sock Connected;
     send_output sock (Raw "\nTEXTER QUEST\n\nPlease enter username")
   in

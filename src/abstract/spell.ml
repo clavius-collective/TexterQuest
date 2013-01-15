@@ -2,7 +2,7 @@
 (* spell.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-include Types
+include Util
 
 type manipulation =
   | Damage
@@ -11,14 +11,14 @@ type manipulation =
 
 type aspect_relation =
   | Create
-  | Manipulate of manipulation
   | Destroy
+  | Manipulate of manipulation
 
 type an_effect = {
   aspect      : Trait.aspect;
   interaction : aspect_relation;
   power       : int;
-  volatility  : float;              (* 0.0-1.0, multiplied by power *)
+  volatility  : float;
 }
 
 type effect =
@@ -30,13 +30,13 @@ type effect =
 type syllable =
   | No                                  (* null syllable *)
   | Erk                                 (* error syllable *)
-
+                                                                               
 let spell_of_string s =
   let syllable_of_string s = match String.lowercase s with
     | "no" -> No
     | _ -> Erk
   in
-  let parts = Util.split s in
+  let parts = split s in
   List.map syllable_of_string parts
 
 (* helper function to determine spell effects based on
@@ -53,6 +53,7 @@ let rec process actor effects (a, b, c) = function
      keep track of focus cost
      keep track of actor's focus
      nondeterminism
+     diminishing returns
      question: elemental affinities here, or in resolution?
      maybe just use a record to keep track of this shit
   *)
@@ -66,20 +67,21 @@ let rec process actor effects (a, b, c) = function
       process actor ((AnEffect e)::effects) (b, c, AnEffect e) xs
 
 (* syllable list -> effect list *)
-let cast actor spell =    
-    (* process spell, make a list of the effects of each
-       group of three subsequent syllables *)
-    let base_effects, _ = List.fold_left
-      (fun (acc, (a ,b, c)) next ->
-        let new_tail = b, c, next in
-        (generate_effect new_tail)::acc, new_tail)
-      ([], (No, No, No))
-      spell
+let cast actor target spell =    
+  let syllables = spell_of_string spell in
+  (* process spell, make a list of the effects of each
+     group of three subsequent syllables *)
+  let base_effects, _ = List.fold_left
+    (fun (acc, (a ,b, c)) next ->
+      let new_tail = b, c, next in
+      (generate_effect new_tail)::acc, new_tail)
+    ([], (No, No, No))
+    syllables
     in
-    process actor [] (Null, Null, Null) base_effects
-      (* 
-         The result of this will be applied differently for
-         * straight cast
-         * enchantment
-         * alchemy?
-      *)
+  process actor [] (Null, Null, Null) base_effects
+(* 
+   The result of this will be applied differently for
+   * straight cast
+   * enchantment
+   * alchemy?
+*)

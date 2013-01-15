@@ -2,7 +2,7 @@
 (* room.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-include Types
+include Util
 
 type room = {
   id : room_id;

@@ -2,7 +2,7 @@
 (* actor.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-include Types
+include Util
 
 let initial_location = "start"
 

@@ -2,6 +2,8 @@
 (* wound.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
+include Util
+
 type severity =
   | Minor 
   | Middling
@@ -9,28 +11,30 @@ type severity =
 
 type t = (severity * int) list ref
 
-let new_wound ?duration severity =
-  let time = Util.get_time () in
+let new_wound ?duration ?(discount=0) severity =
+  let time = get_time () in
   let duration = match duration with
     | Some d -> d
     | None   -> (match severity with
-        | Minor      -> 30
-        | Middling   -> 90
-        | Mortifying -> 270)
+        | Minor      -> 60
+        | Middling   -> 120
+        | Mortifying -> 360)
   in
   severity, time + duration
 
 let check (severity, expire) =
-  if expire > Util.get_time () then
+  let now = get_time () in
+  if expire > now then
     Some (severity, expire)
   else
+    let discount = now - expire in
     match severity with
       | Minor      -> None
-      | Middling   -> Some (new_wound Minor)
-      | Mortifying -> Some (new_wound Middling)
+      | Middling   -> Some (new_wound ~discount Minor)
+      | Mortifying -> Some (new_wound ~discount Middling)
 
-let add_wound t ?duration severity =
-  t := (new_wound ?duration severity)::!t
+let add_wound t ?duration ?discount severity =
+  new_wound ?duration ?discount severity >> t
 
 let total_wounds t =
   let totals, remaining =
@@ -39,9 +43,9 @@ let total_wounds t =
         match check wound with
           | Some (severity, expires) -> 
               (match severity with
-                | Minor      -> a + 1, a', a''
-                | Middling   -> a, a' + 1, a''
-                | Mortifying -> a, a', a'' + 1),
+                | Minor      -> a + 1 , a'    , a''
+                | Middling   -> a     , a' + 1, a''
+                | Mortifying -> a     , a'    , a'' + 1),
               (severity, expires)::remaining
           | None ->
               (a, a', a''), remaining)
