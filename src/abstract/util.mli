@@ -53,4 +53,5 @@ val split : string -> string list
 (* debugging stuff *)
 val no_debug : bool ref
 
+(* debug function that gets turned off by -q flag *)
 val debug : string -> unit

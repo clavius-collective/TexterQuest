@@ -1,7 +1,10 @@
 .PHONY: clean
 
+OCAMLFLAGS += -thread
+
 OCAMLPACKS[] =
-	 str
+	str
+	threads
 
 ABSTRACT_FILES[] =
 	util
@@ -14,6 +17,7 @@ ABSTRACT_FILES[] =
 	object
 	spell
 	action
+	combat
 	game
 
 .DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))

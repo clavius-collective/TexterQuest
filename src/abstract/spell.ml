@@ -49,8 +49,7 @@ let generate_effect = function
 (* Ignore subsequences with no effect, truncate effects
    list if an end sequence occurred. *)
 let rec process actor effects (a, b, c) = function
-  (* 
-     keep track of focus cost
+  (* keep track of focus cost
      keep track of actor's focus
      nondeterminism
      diminishing returns

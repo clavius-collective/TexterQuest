@@ -91,7 +91,9 @@ let create_skills ?initial () = create ?initial all_skills
 let create_traits ?initial () = create ?initial all_traits
 
 let check vec coeffs =
-  let add total (trait, coeff) = total +. (float (get_value vec trait) *. coeff) in
+  let add total (trait, coeff) =
+    total +. (float (get_value vec trait) *. coeff)
+  in
   truncate (List.fold_left add 0.0 coeffs)
 
 let combine_vectors vectors =

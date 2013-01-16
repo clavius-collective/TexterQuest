@@ -9,10 +9,10 @@ include Unix
 
 type client = file_descr
 
+let prompt = ">>>"
+
 let users = Hashtbl.create 100
 let clients = ref []
-
-let new_user = generate_str "user"
 
 let send_output sock s =
   let rec send_part = function
@@ -33,7 +33,7 @@ let send_output sock s =
         List.iter send_part fstrings
   in
   send_part s;
-  send_part (Raw "\n>>> ")
+  send_part (Raw ("\n" ^ prompt ^ " "))
 
 let lookup = Hashtbl.find users
 
@@ -83,7 +83,7 @@ let start () =
   let server =
     let server_sock = socket PF_INET SOCK_STREAM 0 in
     setsockopt server_sock SO_REUSEADDR true;
-    let address = (gethostbyname(gethostname ())).h_addr_list.(0) in
+    let address = (gethostbyname (gethostname ())).h_addr_list.(0) in
     bind server_sock (ADDR_INET (address, 1029));
     listen server_sock 10;
     server_sock
@@ -111,12 +111,10 @@ let start () =
         List.iter (process_input sock) (Str.split endline input)
   in
 
-  let handle_exception = disconnect in
-
   while true do
     let input, _, exceptions = select (server::!clients) [] [] (-1.0) in
     List.iter handle input;
-    List.iter handle_exception exceptions
+    List.iter disconnect exceptions
   done
 
 let _ =
