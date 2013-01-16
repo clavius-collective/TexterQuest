@@ -98,3 +98,9 @@ let do_action t cost action =
   else
     t.queued_action <- Some (cost, action);
   unlock t
+
+let locked t f x =
+  lock t;
+  let value = f x in
+  unlock t;
+  value
