@@ -26,10 +26,6 @@ include Util
    it would be cool to avoid manual build scripts. Really, REALLY cool.
 *)
 
-let tempo_generator actor () = 0
-let initial_balance actor = 0
-let initial_focus actor = 0
-
 module Tempo = struct
   type acc = int
 
@@ -38,8 +34,8 @@ module Tempo = struct
     mutable masks : acc Mask.mask list;
   }
 
-  let create actor =
-    let generate_tempo = tempo_generator actor in
+  let create generator =
+    let generate_tempo = generator in
     let masks = [] in
     {
       generate_tempo;
@@ -55,7 +51,7 @@ end
 
 module TempoMask = Mask.Masker(Tempo)
 
-type combat_traits = {
+type t = {
   mutable tempo         : int;
   mutable balance       : int;
   mutable focus         : int;
@@ -64,20 +60,18 @@ type combat_traits = {
   lock                  : Mutex.t;
 }
 
-let create actor =
+let create ~generator ~balance ~focus =
   let lock = Mutex.create () in
-  let generator = Tempo.create actor in
+  let generator = Tempo.create generator in
   let tempo = TempoMask.get_value generator in
-  let balance = initial_balance actor in
-  let focus = initial_focus actor in
   let queued_action = None in
   {
+    generator;
     tempo;
     balance;                            (* vary with tempo *)
     focus;                              (* vary against tempo *)
     queued_action;
     lock;
-    generator;
   }
 
 let new_tempo t = TempoMask.get_value t.generator

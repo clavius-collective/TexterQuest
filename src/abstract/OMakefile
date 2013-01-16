@@ -5,11 +5,14 @@ OCAMLFLAGS += -thread
 OCAMLPACKS[] =
 	str
 	threads
+#	mutex
 
 ABSTRACT_FILES[] =
+	mutex
 	util
 	mask
 	trait
+	combat
 	wound
 	item
 	actor
@@ -17,7 +20,7 @@ ABSTRACT_FILES[] =
 	object
 	spell
 	action
-	combat
+	ai
 	game
 
 .DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))

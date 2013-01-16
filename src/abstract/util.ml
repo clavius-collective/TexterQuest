@@ -51,3 +51,5 @@ let split = Str.split (Str.regexp "[ \t]+")
 let no_debug = ref false
 
 let debug s = if not !no_debug then print_endline (">> " ^ s)
+
+let _ = Random.init (get_time ())
