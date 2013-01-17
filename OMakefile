@@ -1,0 +1,25 @@
+BYTE_ENABLED = true
+NATIVE_ENABLED = true
+USE_OCAMLFIND = true
+
+.PHONY: clean
+.SUBDIRS: src
+
+OCAMLFLAGS += -thread
+
+PROGRAM = test
+
+OCAML_LIBS[] =
+
+OCAMLINCLUDES += $(dir abstract)
+
+OCAML_OTHER_LIBS[] =
+	unix
+	str
+	threads
+
+.DEFAULT:
+	mv src/test* .
+
+clean:
+	rm *.c* *.o* $(PROGRAM)*
