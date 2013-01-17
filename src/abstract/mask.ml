@@ -4,6 +4,8 @@
 
 include Util
 
+type 'a mask = ('a -> 'a) * int
+
 module T = functor (M : sig
   type t
   type acc

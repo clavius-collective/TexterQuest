@@ -7,7 +7,7 @@ include Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.trait * (int -> int mask)
+  | Mask of Trait.trait * (int -> int Mask.mask)
 
 type aspect_relation =
   | Create
