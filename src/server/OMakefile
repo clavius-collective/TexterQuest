@@ -1,0 +1,14 @@
+.PHONY: clean
+
+OCAMLINCLUDES += ../abstract
+
+OCAML_LIBS += ../abstract/libabstract
+
+OCAMLPACKS[] =
+	unix
+	str
+
+SERVER_FILES[] =
+	telnet
+
+.DEFAULT: $(OCamlLibrary libserver, $(SERVER_FILES))

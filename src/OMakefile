@@ -3,7 +3,7 @@ NATIVE_ENABLED = true
 USE_OCAMLFIND = true
 
 .PHONY: clean
-.SUBDIRS: abstract
+.SUBDIRS: abstract server
 
 OCAMLFLAGS += -thread
 
@@ -11,8 +11,9 @@ PROGRAM = test
 
 OCAML_LIBS[] =
 	abstract/libabstract
+	server/libserver
 
-OCAMLINCLUDES += $(dir abstract)
+OCAMLINCLUDES += $(dir abstract server)
 
 OCAML_OTHER_LIBS[] =
 	unix
@@ -20,9 +21,6 @@ OCAML_OTHER_LIBS[] =
 	threads
 
 FILES[] =
-	telnet
+	main
 
 .DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES))
-
-clean:
-	rm *.c* *.o* $(PROGRAM)*

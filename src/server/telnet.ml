@@ -116,10 +116,3 @@ let start () =
     List.iter handle input;
     List.iter disconnect exceptions
   done
-
-let _ =
-  Arg.parse
-    [
-      "-q", Arg.Set no_debug, "quiet mode"
-    ] (fun _ -> ()) "TelnetsterQuest!";
-  start ()

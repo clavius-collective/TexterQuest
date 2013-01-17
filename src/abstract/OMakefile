@@ -22,6 +22,3 @@ ABSTRACT_FILES[] =
 	game
 
 .DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))
-
-clean:
-	rm *.c* *.o* libabstract*
