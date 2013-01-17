@@ -4,7 +4,7 @@
 
 include Util
 
-module Masker = functor (M : sig
+module T = functor (M : sig
   type t
   type acc
   val get_base : t -> acc

@@ -5,6 +5,8 @@ USE_OCAMLFIND = true
 .PHONY: clean
 .SUBDIRS: abstract
 
+OCAMLFLAGS += -thread
+
 PROGRAM = test
 
 OCAML_LIBS[] =
@@ -15,6 +17,7 @@ OCAMLINCLUDES += $(dir abstract)
 OCAML_OTHER_LIBS[] =
 	unix
 	str
+	threads
 
 FILES[] =
 	telnet

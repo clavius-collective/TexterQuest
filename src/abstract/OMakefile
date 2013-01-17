@@ -5,10 +5,8 @@ OCAMLFLAGS += -thread
 OCAMLPACKS[] =
 	str
 	threads
-#	mutex
 
 ABSTRACT_FILES[] =
-	mutex
 	util
 	mask
 	trait

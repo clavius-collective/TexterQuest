@@ -17,7 +17,7 @@ type behavior =
   | Conditional of ((parameters -> bool) * behavior) list
   | Stochastic of (float * behavior) list
 
-let make_params ai_actor room opponent =
+let make_params ~ai_actor ~room ~opponent =
   {
     ai_actor;
     room;
