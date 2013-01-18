@@ -32,7 +32,7 @@ let generate f =
     incr _counter;
     f !_counter x
 
-let generate_str s = generate (fun i () -> s ^ "_" ^ (string_of_int i))
+let generate_str s f = generate (fun i -> f (s ^ "_" ^ (string_of_int i)))
 
 let (@@) f x = f x
 

@@ -10,7 +10,7 @@ open Util
  * equivalent for our intents and purposes.
  *)
 type t
-    
+
 val create :
   wounds   : Wound.t           ->
   traits   : Trait.vector      ->
@@ -32,6 +32,6 @@ val set_loc : t -> room_id -> unit
 
 val add_wound : t -> ?duration:int -> ?discount:int -> Wound.severity -> unit
 
-val defeated : t -> bool
+val is_defeated : t -> bool
 
 val describe : t -> fstring

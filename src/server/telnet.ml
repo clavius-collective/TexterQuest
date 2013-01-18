@@ -2,7 +2,7 @@
 (* telnet.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-(* This produces an executable that will run a telnet server for the game. *)
+(* This exports a start function that will run a telnet server for the game. *)
 
 include Util
 include Unix
@@ -51,7 +51,7 @@ let disconnect sock =
   Hashtbl.remove users sock;
   clients := remove sock !clients;
   shutdown sock SHUTDOWN_ALL
-
+    
 let check_login input =
   let player = input in
   Some player

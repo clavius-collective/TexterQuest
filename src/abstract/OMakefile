@@ -10,7 +10,6 @@ ABSTRACT_FILES[] =
 	util
 	mask
 	trait
-	combat
 	wound
 	item
 	actor
@@ -19,6 +18,7 @@ ABSTRACT_FILES[] =
 	spell
 	action
 	ai
+	combat
 	game
 
 .DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))

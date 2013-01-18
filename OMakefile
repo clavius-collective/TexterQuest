@@ -2,7 +2,6 @@ BYTE_ENABLED = true
 NATIVE_ENABLED = true
 USE_OCAMLFIND = true
 
-.PHONY: clean
 .SUBDIRS: src
 
 PROGRAM = test
@@ -10,4 +9,4 @@ PROGRAM = test
 OCAML_LIBS[] =
 
 .DEFAULT:
-	mv src/test* .
+	mv src/test .

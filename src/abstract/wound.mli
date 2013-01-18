@@ -21,5 +21,5 @@ val add_wound :
   severity      ->                 (* the severity of the new wound          *)
   unit
 
-(* return the total number of wounds at each degree of severity *)
+(* return the total number of wounds at each degree of severity (increasing) *)
 val total_wounds : t -> (int * int * int)

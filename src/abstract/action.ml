@@ -4,6 +4,15 @@
 
 include Util
 
+(*
+
+type t =
+  | Either of Actor.t * any_action
+  | Combat of Actor.t * int * combat_action
+  | NonCombat of Actor.t * noncombat_action
+
+*)
+
 type t =
   | Move of int
   | Cast of string
@@ -23,3 +32,4 @@ let string_of_action act =
   | Move i -> "move " ^ (string_of_int i)
   | Cast spell_and_target -> "cast " ^ spell_and_target
   | ActionError -> "No action done."
+

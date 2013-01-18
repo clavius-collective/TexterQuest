@@ -4,19 +4,25 @@
 
 include Util
 
+let state_lock = Mutex.create ()
+
+let locked f x =
+  Mutex.lock state_lock;
+  let value = f x in
+  Mutex.unlock state_lock;
+  value
+
 let players = Hashtbl.create 100
 
-let get_character = Hashtbl.find players
+let new_character = generate_str "character"
+  (fun name send player -> Actor.create_new ~send name)
 
-let init_character send = generate
-  (fun i player ->
-    let name = "player_" ^ (string_of_int i) in
-    Actor.create_new ~send name)
+let get_character = Hashtbl.find players
 
 let player_login player = Raw ("Hello, " ^ player ^ ". Make a character?")
 
 let player_select_character send player character =
-  let character = init_character send player in
+  let character = new_character send player in
   Hashtbl.add players player character;
   let room = Actor.get_loc character in
   send (Room.enter character room)
@@ -27,7 +33,7 @@ let player_logout player =
 
 let check actor action = true
 
-let process_input player input =
+let process_input = locked (fun player input ->
   let open Action in
       let character = get_character player in
       let act = action_of_string character input in
@@ -36,4 +42,4 @@ let process_input player input =
           | Move i -> Room.move character i
           | Cast spell -> Raw input
           | ActionError -> Raw input)
-      else (Actor.send character) (Raw "INVALID COMMAND")
+      else (Actor.send character) (Raw "INVALID COMMAND"))
