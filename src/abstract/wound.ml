@@ -5,15 +5,20 @@
 include Util
 
 type severity =
+  | Glancing
+  | Stun
   | Minor 
   | Middling
-  | Mortifying
+  | Critical
+  | Mortal
 
 (* severity and expiration *)
 type wound = severity * int
 
 type t = wound list ref
 
+(* This will need to change *slightly* to accomodate the special nature of
+   Glancing, Stun, and Mortal wounds. *)
 let new_wound ?duration ?(discount=0) severity =
   let now = get_time () in
   let duration = match duration with
