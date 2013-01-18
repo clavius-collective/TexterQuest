@@ -9,3 +9,4 @@ PROGRAM = test
 OCAML_LIBS[] =
 
 .DEFAULT:
+	ln -sf src/test test

@@ -9,4 +9,5 @@ let _ =
     [
       "-q", Arg.Set no_debug, "quiet mode"
     ] (fun _ -> ()) "TelnetsterQuest!";
+  ignore (Combat.start ());
   Telnet.start ()

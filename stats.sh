@@ -4,6 +4,6 @@
 
 source=`find . -name "*.ml*"`
 touch .dummy
-rm `find . -name "*.[coa]*"` `ls | grep test` .dummy
+rm `find . -name "*.[coa]*"` `find . -name "test*"` .dummy
 wc -L $source
 wc -l $source | tail -n 1

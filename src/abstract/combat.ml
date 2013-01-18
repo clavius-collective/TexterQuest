@@ -71,14 +71,6 @@ let add_tempo t =
 
 let lookup = Hashtbl.find in_combat
 
-let do_action = locked (fun actor cost action ->
-  let t = lookup actor in
-  if t.tempo > 0 then 
-    (t.tempo <- t.tempo - cost;
-     submit_action action)
-  else
-    t.queued_action <- Some (cost, action))
-
 let is_in_combat actor =
   try
     ignore (lookup actor);
@@ -86,9 +78,20 @@ let is_in_combat actor =
   with
     | Not_found -> false
 
-let enter_combat = locked (fun actor ->
-  if not (is_in_combat actor) then
-    Hashtbl.add in_combat actor (create actor))
+let enter_combat actor =
+  try ignore (lookup actor) with
+    | Not_found ->
+        let t = create actor in
+        Hashtbl.add in_combat actor t
+
+let queue_action = locked (fun actor cost action ->
+  enter_combat actor;
+  let t = lookup actor in
+  if t.tempo > 0 then 
+    (t.tempo <- t.tempo - cost;
+     submit_action action)
+  else
+    t.queued_action <- Some (cost, action))
 
 let leave_combat = locked (fun actor -> Hashtbl.remove in_combat actor)
 
@@ -96,10 +99,10 @@ let stop = locked (fun () -> running := false)
 
 let start () =
   let react () =
+    debug "combat thread starting";
     running := true;
     while !running do
       Thread.delay 0.5;
-      print_endline "running!";
       Mutex.lock combat_lock;
       Hashtbl.iter (fun _ t -> add_tempo t) in_combat;
       Mutex.unlock combat_lock
