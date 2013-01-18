@@ -99,6 +99,7 @@ let start () =
     running := true;
     while !running do
       Thread.delay 0.5;
+      print_endline "running!";
       Mutex.lock combat_lock;
       Hashtbl.iter (fun _ t -> add_tempo t) in_combat;
       Mutex.unlock combat_lock

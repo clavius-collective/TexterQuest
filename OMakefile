@@ -9,4 +9,3 @@ PROGRAM = test
 OCAML_LIBS[] =
 
 .DEFAULT:
-	mv src/test .

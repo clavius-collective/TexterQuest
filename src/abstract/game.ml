@@ -4,12 +4,14 @@
 
 include Util
 
-let state_lock = Mutex.create ()
+(* this will eventually be the listener module, with a listener thread *)
+
+let game_lock = Mutex.create ()
 
 let locked f x =
-  Mutex.lock state_lock;
+  Mutex.lock game_lock;
   let value = f x in
-  Mutex.unlock state_lock;
+  Mutex.unlock game_lock;
   value
 
 let players = Hashtbl.create 100
@@ -37,6 +39,7 @@ let process_input = locked (fun player input ->
   let open Action in
       let character = get_character player in
       let act = action_of_string character input in
+      (* checking will be moved into mutator module *)
       if check character act then
         (Actor.send character) (match act with
           | Move i -> Room.move character i

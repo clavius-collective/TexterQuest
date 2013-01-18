@@ -11,6 +11,7 @@ type room = {
   exits : (room_id * string) array;
 }
 
+(* module state *)
 let rooms = Hashtbl.create 100
 
 let get = Hashtbl.find rooms
