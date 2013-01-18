@@ -20,7 +20,7 @@ module Tempo = struct
   let get_masks t = t.masks
   let set_masks t masks = t.masks <- masks
 end
- 
+
 module TempoMask = Mask.T (Tempo)
 
 type t = {
@@ -32,9 +32,14 @@ type t = {
 }
 
 (* module state *)
-let combat_lock = Mutex.create ()
-let running = ref false
 let in_combat = Hashtbl.create 100
+let running = ref false
+let lock = Mutex.create ()
+let locked f x =
+    Mutex.lock lock;
+    let value = f x in
+    Mutex.unlock lock;
+    value
 
 let create actor =
   let generator_function () = 0 in
@@ -51,13 +56,7 @@ let create actor =
     queued_action;
   }
 
-let submit_action = ignore
-
-let locked f x =
-  Mutex.lock combat_lock;
-  let value = f x in
-  Mutex.unlock combat_lock;
-  value
+let submit_action action = ignore action
 
 let add_tempo t =
   let new_tempo = TempoMask.get_value t.generator in
@@ -84,16 +83,18 @@ let enter_combat actor =
         let t = create actor in
         Hashtbl.add in_combat actor t
 
-let queue_action = locked (fun actor cost action ->
+let leave_combat = locked (Hashtbl.remove in_combat)
+
+let queue_action = locked (fun action ->
+  let actor = Action.get_actor action in
+  let cost = Action.get_cost action in
   enter_combat actor;
   let t = lookup actor in
-  if t.tempo > 0 then 
+  if t.tempo > 0 then
     (t.tempo <- t.tempo - cost;
      submit_action action)
   else
     t.queued_action <- Some (cost, action))
-
-let leave_combat = locked (fun actor -> Hashtbl.remove in_combat actor)
 
 let stop = locked (fun () -> running := false)
 
@@ -103,9 +104,7 @@ let start () =
     running := true;
     while !running do
       Thread.delay 0.5;
-      Mutex.lock combat_lock;
-      Hashtbl.iter (fun _ t -> add_tempo t) in_combat;
-      Mutex.unlock combat_lock
+      (locked (Hashtbl.iter (fun _ t -> add_tempo t))) in_combat;
     done
   in
   Thread.create react ()

@@ -66,17 +66,19 @@ let process_input sock input =
             | Some player ->
                 debug (player ^ " logged in");
                 Hashtbl.replace users sock (CharSelect player);
-                send_output sock (Game.player_login player)
+                send_output sock (Listener.player_login player)
             | None -> 
                 send_output sock (Raw "Invalid username, please try again."))
       | CharSelect player ->
           Hashtbl.replace users sock (LoggedIn player);
           let send = (send_output sock) in
-          Game.player_select_character send player 0
+          Listener.player_select_character send player 0
       | LoggedIn player -> 
-          Game.process_input player input
+          Listener.process_input player input
 
 let start () =
+  debug "telnet server starting";
+
   Room.create "start" "the starting zone" [|"other", "another room"|];
   Room.create "other" "the other room" [|"start", "the first room"|];
 
