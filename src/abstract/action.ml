@@ -33,5 +33,3 @@ let string_of_action act =
   | Cast spell_and_target -> "cast " ^ spell_and_target
   | ActionError -> "No action done."
 
-let get_actor t = Actor.create_new ~send:ignore "Adulous Hocington"
-let get_cost t = 0

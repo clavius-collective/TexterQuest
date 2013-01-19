@@ -19,6 +19,6 @@ ABSTRACT_FILES[] =
 	action
 	ai
 	combat
-	listener
+	game
 
 .DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))

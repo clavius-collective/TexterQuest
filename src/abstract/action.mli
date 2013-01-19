@@ -18,6 +18,3 @@ val string_of_action : t -> string
    It will be useful to have this sometimes, but generally we'll want
    a description of the t to be generated for the player's benefit. *)
 (* val complete_action : t -> unit *)
-
-val get_actor : t -> Actor.t
-val get_cost : t -> int
