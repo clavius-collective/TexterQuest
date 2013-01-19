@@ -27,7 +27,7 @@ let new_wound ?duration ?(discount=0) severity =
         (* default durations *)
         | Minor -> 60
         | Middling -> 120
-        | Critical -> 360)
+        | Mortifying -> 360)
   in
   let expire = now + duration - discount in
   severity, expire
@@ -45,7 +45,7 @@ let rec check (severity, expire) =
     match severity with
       | Minor -> None                   (* fully healed *)
       | Middling
-      | Critical -> 
+      | Mortifying -> 
           (* serious wounds heal to the next less serious level *)
           let new_severity = (match severity with
             | Minor -> failwith "sanity check failed"
@@ -74,7 +74,7 @@ let total_wounds t =
               (match severity with
                 | Minor      -> a + 1 , a'    , a''
                 | Middling   -> a     , a' + 1, a''
-                | Critical   -> a     , a'    , a'' + 1),
+                | Mortifying -> a     , a'    , a'' + 1),
               (severity, expires)::remaining
           | None ->
               (* fully healed (discard from list) *)
