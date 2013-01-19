@@ -7,15 +7,13 @@ include Util
 type severity =
   | Minor 
   | Middling
-  | Critical
+  | Mortifying
 
 (* severity and expiration *)
 type wound = severity * int
 
 type t = wound list ref
 
-(* This will need to change *slightly* to accomodate the special nature of
-   Glancing, Stun, and Mortal wounds. *)
 let new_wound ?duration ?(discount=0) severity =
   let now = get_time () in
   let duration = match duration with
@@ -24,7 +22,7 @@ let new_wound ?duration ?(discount=0) severity =
         (* default durations *)
         | Minor -> 60
         | Middling -> 120
-        | Critical -> 360)
+        | Mortifying -> 360)
   in
   let expire = now + duration - discount in
   severity, expire
@@ -42,12 +40,12 @@ let rec check (severity, expire) =
     match severity with
       | Minor -> None                   (* fully healed *)
       | Middling
-      | Critical -> 
+      | Mortifying -> 
           (* serious wounds heal to the next less serious level *)
           let new_severity = (match severity with
             | Minor -> failwith "sanity check failed"
             | Middling -> Minor
-            | Critical -> Middling)
+            | Mortifying -> Middling)
           in
           let (_, new_expire) as wound = (new_wound ~discount new_severity) in
           if new_expire > now then
@@ -71,7 +69,7 @@ let total_wounds t =
               (match severity with
                 | Minor      -> a + 1 , a'    , a''
                 | Middling   -> a     , a' + 1, a''
-                | Critical   -> a     , a'    , a'' + 1),
+                | Mortifying -> a     , a'    , a'' + 1),
               (severity, expires)::remaining
           | None ->
               (* fully healed (discard from list) *)

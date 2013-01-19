@@ -6,7 +6,7 @@
 type severity =
   | Minor 
   | Middling
-  | Critical
+  | Mortifying
 
 (* the object that tracks a given actor's wounds                             *)
 type t
