@@ -9,6 +9,7 @@ OCAMLPACKS[] =
 	str
 
 SERVER_FILES[] =
+	server_util
 	telnet
 
 .DEFAULT: $(OCamlLibrary libserver, $(SERVER_FILES))

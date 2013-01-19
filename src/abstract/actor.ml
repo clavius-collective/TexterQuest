@@ -6,13 +6,18 @@ include Util
 
 let initial_location = "start"
 
+type combat_stats = {
+  balance : int;
+  focus : int;
+}
+
 type t = {
-  name                 : string;
-  wounds               : Wound.t;
-  traits               : Trait.vector;
-  send                 : fstring -> unit;
-  mutable combat_stats : (int * int) option; (* balance, then focus *)
-  mutable location     : room_id;  
+  name             : string;
+  wounds           : Wound.t;
+  traits           : Trait.vector;
+  send             : fstring -> unit;
+  mutable combat   : combat_stats option;
+  mutable location : room_id;  
 }
 
 (* 
@@ -26,7 +31,7 @@ let create ~wounds ~traits ~send ~location name  =
     wounds;
     traits;
     send;
-    combat_stats = None
+    combat = None
   }
 
 let create_new = create
@@ -60,16 +65,16 @@ let describe t = Raw t.name
 let initial_focus t = 0
 let initial_balance t = 0
 
-let get_focus t = match t.combat_stats with
-  | Some (_, focus) -> focus
+let get_focus t = match t.combat with
+  | Some stats -> stats.focus
   | None -> initial_focus t
 
-let get_balance t = match t.combat_stats with
-  | Some (balance, _) -> balance
+let get_balance t = match t.combat with
+  | Some stats -> stats.balance
   | None -> initial_balance t
 
 let enter_combat t =
-  t.combat_stats <- Some (initial_balance t, initial_focus t)
+  t.combat <- Some {balance = initial_balance t; focus = initial_focus t}
 
 let leave_combat t =
-  t.combat_stats <- None
+  t.combat <- None

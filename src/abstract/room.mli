@@ -8,6 +8,8 @@
 
 open Util 
 
+type t = room_id
+
 (*
  * This function does not return a room; it ADDS A ROOM to the module's
  * internal graph of the game map.
@@ -19,9 +21,9 @@ val create :
   unit
 
 val leave : Actor.t -> unit
-val enter : Actor.t -> room_id -> fstring
+val enter : Actor.t -> t -> fstring
 val move : Actor.t -> int -> fstring
    
-val list_actors : room_id -> fstring
-val list_exits : room_id -> fstring
-val describe : room_id -> fstring
+val list_actors : t -> fstring
+val list_exits : t -> fstring
+val describe : t -> fstring

@@ -4,7 +4,7 @@
 
 (* This exports a start function that will run a telnet server for the game. *)
 
-include Util
+include Server_util
 include Unix
 
 type client = file_descr

@@ -5,8 +5,8 @@
 open Util
 
 type t =
-  | OActor of Actor.t
-  | ORoom of room_id
-  | OItem of Item.t
+  | ActorObj of Actor.t
+  | RoomObj of Room.t
+  | ItemObj of Item.t
 
 val describe : t -> fstring

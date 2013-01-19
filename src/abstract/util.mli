@@ -7,11 +7,6 @@ type room_id = string
 
 type username = string
 
-type user_state =
-  | Connected
-  | CharSelect of username
-  | LoggedIn   of username
-
 (* formatted output *)
 type color = int
 

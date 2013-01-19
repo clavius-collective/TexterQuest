@@ -8,7 +8,7 @@ let default params = true
 
 type parameters = {
   ai_actor : Actor.t;
-  room : room_id;
+  room : Room.t;
   opponent : Actor.t list;
 }
 
