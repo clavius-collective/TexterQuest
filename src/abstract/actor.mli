@@ -40,6 +40,9 @@ val get_focus : t -> int
 
 val get_balance : t -> int
 
+(* 
+ * DO NOT call these directly; they should be called only by the functions of
+ * the same name in Combat.
+ *)
 val enter_combat : t -> unit
-
 val leave_combat : t -> unit
