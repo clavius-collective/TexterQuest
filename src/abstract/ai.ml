@@ -28,7 +28,7 @@ let select_randomly options =
   let roll = Random.float 1.0 in
   let rec maybe_choose current = function
       | [] ->
-          Act (fun x -> Action.ActionError)
+          Act (fun params -> params.ai_actor, Action.ActionError)
       | (range, behavior)::xs ->
           if range >= current then
             behavior
@@ -42,7 +42,7 @@ let rec choose_action parameters = function
       create_action parameters
   | Conditional choices ->
       (match choices with
-        | [] -> Action.ActionError
+        | [] -> parameters.ai_actor, Action.ActionError
         | (cond, behavior)::xs ->
             if cond parameters then
               choose_action parameters behavior

@@ -2,10 +2,12 @@
 (* action.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
-type t =
+type action =
   | Move of int
   | Cast of string
   | ActionError
+
+type t = Actor.t * action
 
 (* These are two fairly straightforward functions; the second in particular for
    when NPCs do things. *)

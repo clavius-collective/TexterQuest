@@ -4,12 +4,9 @@
 
 (* subject to change                                                         *)
 type severity =
-  | Glancing
-  | Stun
   | Minor 
   | Middling
   | Critical
-  | Mortal
 
 (* the object that tracks a given actor's wounds                             *)
 type t

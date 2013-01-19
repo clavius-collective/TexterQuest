@@ -34,14 +34,10 @@ let player_logout = locked (fun player ->
  * instead of just responding, action will be sent to either combat or
  * mutator thread, depending on whether it is a combat action
  *)
-let process_action character action = 
-  let open Action in
-      Actor.send character (match action with
-        | Move i -> Room.move character i
-        | Cast spell -> Raw "cast a spell"
-        | ActionError -> Raw "INVALID COMMAND")
+let process_action action = 
+  Mutator.submit action
         
 let process_input = locked (fun player input ->
   let character = get_character player in
   let action = Action.action_of_string character input in
-  process_action character action)
+  process_action action)

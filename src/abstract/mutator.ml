@@ -17,7 +17,13 @@ let submit = locked (fun action ->
   Queue.add action actions;
   Condition.signal condition)
 
-let handle_action = ignore
+let handle_action action = 
+  let open Action in
+      let character = Action.get_actor action in
+      Actor.send character (match action with
+        | _, Move i -> Room.move character i
+        | _, Cast spell -> Raw "cast a spell"
+        | _, ActionError -> Raw "INVALID COMMAND")
 
 let start () =
   debug "mutator starting";

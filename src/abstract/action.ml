@@ -13,25 +13,24 @@ type t =
 
 *)
 
-type t =
+type action =
   | Move of int
   | Cast of string
   | ActionError
 
-let action_of_string actor input = 
+type t = Actor.t * action
+
+let action_of_string actor input =
+  actor,
   match Str.bounded_split (Str.regexp "[., \t]+") input 2 with
     | ["go"; i] -> Move (int_of_string i)
-    (* For spell:
-     * extract target designation
-     * get spell, translate to syllable list
-    *)
     | _ -> ActionError
 
 let string_of_action act = 
   match act with
-  | Move i -> "move " ^ (string_of_int i)
-  | Cast spell_and_target -> "cast " ^ spell_and_target
-  | ActionError -> "No action done."
+  | actor, (Move i) -> "move " ^ (string_of_int i)
+  | actor, (Cast spell_and_target) -> "cast " ^ spell_and_target
+  | actor, ActionError -> "No action done."
 
-let get_actor t = Actor.create_new ~send:ignore "Adulous Hocington"
+let get_actor (actor, _) = actor
 let get_cost t = 0

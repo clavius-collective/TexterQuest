@@ -5,12 +5,9 @@
 include Util
 
 type severity =
-  | Glancing
-  | Stun
   | Minor 
   | Middling
   | Critical
-  | Mortal
 
 (* severity and expiration *)
 type wound = severity * int
@@ -50,7 +47,7 @@ let rec check (severity, expire) =
           let new_severity = (match severity with
             | Minor -> failwith "sanity check failed"
             | Middling -> Minor
-            | Mortifying -> Middling)
+            | Critical -> Middling)
           in
           let (_, new_expire) as wound = (new_wound ~discount new_severity) in
           if new_expire > now then
