@@ -5,5 +5,5 @@
 source=`find . -name "*.ml*"`
 touch .dummy
 rm `find . -name "*.[coa]*"` `find . -name "test*"` .dummy
-wc -L $source
+wc -L $source | tail -n 1
 wc -l $source | tail -n 1

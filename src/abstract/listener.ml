@@ -4,8 +4,6 @@
 
 include Util
 
-(* this will eventually be the listener module, with a listener thread *)
-
 (* module state *)
 let players = Hashtbl.create 100
 let lock = Mutex.create ()
@@ -32,15 +30,18 @@ let player_logout = locked (fun player ->
   Room.leave (get_character player);
   Hashtbl.remove players player)
 
-let process_input = locked (fun player input ->
+(* 
+ * instead of just responding, action will be sent to either combat or
+ * mutator thread, depending on whether it is a combat action
+ *)
+let process_action character action = 
   let open Action in
-      let character = get_character player in
-      let act = action_of_string character input in
-      (* 
-         instead of just responding, action will be sent to either combat or
-         mutator thread, depending on whether it is a combat action
-      *)
-      (Actor.send character) (match act with
+      Actor.send character (match action with
         | Move i -> Room.move character i
-        | Cast spell -> Raw input
-        | ActionError -> Raw "INVALID COMMAND"))
+        | Cast spell -> Raw "cast a spell"
+        | ActionError -> Raw "INVALID COMMAND")
+        
+let process_input = locked (fun player input ->
+  let character = get_character player in
+  let action = Action.action_of_string character input in
+  process_action character action)

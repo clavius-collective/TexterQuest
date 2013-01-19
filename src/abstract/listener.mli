@@ -2,6 +2,8 @@
 (* game.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
+(* This module will be handling login, logout, character select, etc. *)
+
 open Util
 
 val process_input : username -> string -> unit

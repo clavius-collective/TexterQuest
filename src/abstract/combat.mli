@@ -8,7 +8,7 @@
  * leaves combat when a fight ends.
  *)
 
-val start : unit -> Thread.t
+val start : unit -> unit
 val stop : unit -> unit
 
 (*

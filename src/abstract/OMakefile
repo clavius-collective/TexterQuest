@@ -18,6 +18,7 @@ ABSTRACT_FILES[] =
 	spell
 	action
 	ai
+	mutator
 	combat
 	listener
 

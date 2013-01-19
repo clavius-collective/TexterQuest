@@ -25,8 +25,6 @@ module TempoMask = Mask.T (Tempo)
 
 type t = {
   mutable tempo         : int;
-  mutable balance       : int;
-  mutable focus         : int;
   mutable queued_action : (int * Action.t) option;
   generator             : Tempo.t;
 }
@@ -43,20 +41,14 @@ let locked f x =
 
 let create actor =
   let generator_function () = 0 in
-  let balance = 0 in
-  let focus = 0 in
   let generator = Tempo.create generator_function in
   let tempo = TempoMask.get_value generator in
   let queued_action = None in
   {
     generator;
     tempo;
-    balance;                            (* vary with tempo *)
-    focus;                              (* vary against tempo *)
     queued_action;
   }
-
-let submit_action action = ignore action
 
 let add_tempo t =
   let new_tempo = TempoMask.get_value t.generator in
@@ -66,7 +58,8 @@ let add_tempo t =
       | None -> ()
       | Some (cost, action) ->
           t.tempo <- t.tempo - cost;
-          submit_action action)
+          (* Mutator.submit action) *)
+          ())
 
 let lookup = Hashtbl.find in_combat
 
@@ -77,13 +70,16 @@ let is_in_combat actor =
   with
     | Not_found -> false
 
-let enter_combat actor =
+let enter_combat = locked (fun actor ->
   try ignore (lookup actor) with
     | Not_found ->
         let t = create actor in
-        Hashtbl.add in_combat actor t
+        Actor.enter_combat actor;
+        Hashtbl.add in_combat actor t)
 
-let leave_combat = locked (Hashtbl.remove in_combat)
+let leave_combat = locked (fun actor ->
+  Actor.leave_combat actor;
+  Hashtbl.remove in_combat actor)
 
 let queue_action = locked (fun action ->
   let actor = Action.get_actor action in
@@ -92,7 +88,8 @@ let queue_action = locked (fun action ->
   let t = lookup actor in
   if t.tempo > 0 then
     (t.tempo <- t.tempo - cost;
-     submit_action action)
+     (* Mutator.submit action) *)
+     ())
   else
     t.queued_action <- Some (cost, action))
 
@@ -107,4 +104,4 @@ let start () =
       (locked (Hashtbl.iter (fun _ t -> add_tempo t))) in_combat;
     done
   in
-  Thread.create react ()
+  ignore (Thread.create react ())

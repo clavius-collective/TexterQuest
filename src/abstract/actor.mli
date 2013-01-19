@@ -35,3 +35,11 @@ val add_wound : t -> ?duration:int -> ?discount:int -> Wound.severity -> unit
 val is_defeated : t -> bool
 
 val describe : t -> fstring
+
+val get_focus : t -> int
+
+val get_balance : t -> int
+
+val enter_combat : t -> unit
+
+val leave_combat : t -> unit
