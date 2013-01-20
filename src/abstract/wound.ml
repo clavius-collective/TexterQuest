@@ -59,7 +59,7 @@ module W = struct
     | Mortifying -> (a, b, c + 1)
 end
 
-module WMask = Mask.TReplace(W)
+module WMask = Mask.WithReplace(W)
 
 include W
 

@@ -60,12 +60,10 @@ let all_traits = all_aspects @ all_attributes @ all_skills
 
 module StatMask = Mask.T (struct
   type acc = int
-  type mask = stat_mask
   type t = stat
   let get_base t = truncate t.value
   let get_masks t = t.masks
   let set_masks t m = t.masks <- m
-  let apply_mask acc m = m acc
 end)
 
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }

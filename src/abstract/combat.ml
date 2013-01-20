@@ -6,10 +6,9 @@ include Util
 
 module Tempo = struct
   type acc = int
-  type mask = int -> int
   type t = {
     generate_tempo : unit -> int;
-    mutable masks  : (mask * int) list;
+    mutable masks  : ((acc -> acc) * int) list;
   }
 
   let create generator = {
@@ -20,7 +19,6 @@ module Tempo = struct
   let get_base t : int = t.generate_tempo ()
   let get_masks t = t.masks
   let set_masks t masks = t.masks <- masks
-  let apply_mask acc mask = mask acc
 end
 
 module TempoMask = Mask.T (Tempo)

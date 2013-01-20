@@ -4,7 +4,7 @@
 
 include Util
 
-module TReplace = functor (M : sig
+module WithReplace = functor (M : sig
   type t
   type acc
   type mask
@@ -37,20 +37,7 @@ end) -> struct
     final_val
 end
 
-(* module T = functor (M : sig *)
-(*   type t *)
-(*   type acc *)
-(*   type mask *)
-(*   val get_base : t -> acc *)
-(*   val get_masks : t -> (mask * int) list *)
-(*   val set_masks : t -> (mask * int) list -> unit *)
-(*   val apply_mask : acc -> mask -> acc *)
-(* end) -> TReplace (struct *)
-(*   include M *)
-(*   let replace mask = None *)
-(* end) *)
-
-module NoReplace = functor (M : sig
+module NoneReplace = functor (M : sig
   type t
   type acc
   type mask
@@ -81,4 +68,4 @@ module T = functor (M : sig
   val get_base : t -> acc
   val get_masks : t -> ((acc -> acc) * int) list
   val set_masks : t -> ((acc -> acc) * int) list -> unit
-end) -> TReplace (NoReplace (StandardMask (M)))
+end) -> WithReplace (NoneReplace (StandardMask (M)))

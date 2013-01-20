@@ -28,7 +28,7 @@ end)
 (*   val get_value : M.t -> M.acc *)
 (* end) *)
 
-module TReplace : functor (M : sig
+module WithReplace : functor (M : sig
   type t
   type acc
   type mask
