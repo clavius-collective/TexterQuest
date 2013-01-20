@@ -63,6 +63,7 @@ let send t = t.send
 let describe t = Raw t.name
 
 let initial_focus t = 0
+
 let initial_balance t = 0
 
 let get_focus t = match t.combat with

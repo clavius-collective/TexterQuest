@@ -37,15 +37,48 @@ end) -> struct
     final_val
 end
 
-module T = functor (M : sig
+(* module T = functor (M : sig *)
+(*   type t *)
+(*   type acc *)
+(*   type mask *)
+(*   val get_base : t -> acc *)
+(*   val get_masks : t -> (mask * int) list *)
+(*   val set_masks : t -> (mask * int) list -> unit *)
+(*   val apply_mask : acc -> mask -> acc *)
+(* end) -> TReplace (struct *)
+(*   include M *)
+(*   let replace mask = None *)
+(* end) *)
+
+module NoReplace = functor (M : sig
   type t
   type acc
   type mask
   val get_base : t -> acc
-  val get_masks : t -> (mask * int) list
-  val set_masks : t -> (mask * int) list -> unit
+  val get_masks : t -> ((acc -> acc) * int) list
+  val set_masks : t -> ((acc -> acc) * int) list -> unit
   val apply_mask : acc -> mask -> acc
-end) -> TReplace (struct
+end) -> (struct
   include M
   let replace mask = None
 end)
+
+module StandardMask = functor (M : sig
+  type t
+  type acc
+  val get_base : t -> acc
+  val get_masks : t -> ((acc -> acc) * int) list
+  val set_masks : t -> ((acc -> acc) * int) list -> unit
+end) -> (struct
+  include M
+  type mask = M.acc -> M.acc
+  let apply_mask acc mask = mask acc
+end)
+
+module T = functor (M : sig
+  type t
+  type acc
+  val get_base : t -> acc
+  val get_masks : t -> ((acc -> acc) * int) list
+  val set_masks : t -> ((acc -> acc) * int) list -> unit
+end) -> TReplace (NoReplace (StandardMask (M)))
