@@ -31,7 +31,7 @@ let generate_str s f = generate (fun i -> f (s ^ "_" ^ (string_of_int i)))
 
 let (@@) f x = f x
 
-let (>>) elt list_ref = list_ref := elt :: !list_ref
+let (<<) list_ref elt = list_ref := elt :: !list_ref
 
 let matches_ignore_case pattern string =
   let re = Str.regexp_case_fold pattern in

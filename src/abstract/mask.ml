@@ -4,16 +4,16 @@
 
 include Util
 
-type 'a mask = ('a -> 'a) * int
-
-module T = functor (M : sig
+module TReplace = functor (M : sig
   type t
   type acc
+  type mask
   val get_base : t -> acc
-  val get_masks : t -> acc mask list
-  val set_masks : t -> acc mask list -> unit
+  val get_masks : t -> (mask * int) list
+  val set_masks : t ->  (mask * int) list -> unit
+  val replace : (mask * int) -> (mask * int) option
+  val apply_mask : acc -> mask -> acc
 end) -> struct
-
   let add_mask t (func, duration) =
     let expire = duration + get_time () in
     M.set_masks t ((func, expire)::(M.get_masks t))
@@ -24,13 +24,28 @@ end) -> struct
       List.fold_right
         (fun ((func, expire) as mask) (total, active) ->
           if expire > time then
-            func(total), mask::active
+            M.apply_mask total func, mask::active
           else
-            total, active)
+            match M.replace mask with
+              | Some ((func, _) as mask) ->
+                  M.apply_mask total func, mask::active
+              | None -> total, active)
         (M.get_masks t)
         (M.get_base t, [])
     in
     M.set_masks t active;
     final_val
-
 end
+
+module T = functor (M : sig
+  type t
+  type acc
+  type mask
+  val get_base : t -> acc
+  val get_masks : t -> (mask * int) list
+  val set_masks : t -> (mask * int) list -> unit
+  val apply_mask : acc -> mask -> acc
+end) -> TReplace (struct
+  include M
+  let replace mask = None
+end)

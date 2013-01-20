@@ -32,9 +32,11 @@ type skill = [
 
 type trait = [ aspect | attribute | skill ]
 
+type stat_mask = int -> int
+
 type stat = {
   mutable value : float;
-  mutable masks : ((int -> int) * int) list
+  mutable masks : (stat_mask * int) list
 }
 
 type vector = (trait * stat) list
@@ -58,10 +60,12 @@ let all_traits = all_aspects @ all_attributes @ all_skills
 
 module StatMask = Mask.T (struct
   type acc = int
+  type mask = stat_mask
   type t = stat
   let get_base t = truncate t.value
   let get_masks t = t.masks
   let set_masks t m = t.masks <- m
+  let apply_mask acc m = m acc
 end)
 
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }

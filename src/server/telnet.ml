@@ -93,7 +93,7 @@ let start () =
 
   let accept_client () =
     let sock, addr = accept server in
-    sock >> clients;
+    clients << sock;
     Hashtbl.add users sock Connected;
     send_output sock (Raw "\nTEXTER QUEST\n\nPlease enter username")
   in

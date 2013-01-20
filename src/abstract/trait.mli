@@ -56,11 +56,13 @@ val all_traits     : trait list
  *)
 type vector
 
+type stat_mask = int -> int
+
 (* Temporarily modify the value of a trait.                                  *)
 val mask :
   vector        ->      (* the traits of the object in question              *)
   trait         ->      (* the id of the trait getting masked                *)
-  int Mask.mask ->      (* the effect (e.g. (+) 2 to increase by 2)          *)
+  (int -> int) * int ->      (* the effect (e.g. (+) 2 to increase by 2)          *)
   unit
 
 (* Look up the "visible" value of the trait for a given object's vector.     *)

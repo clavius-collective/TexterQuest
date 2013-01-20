@@ -38,7 +38,7 @@ val remove : 'a -> 'a list -> 'a list
 val matches_ignore_case : string -> string -> bool
 
 (* list ref stateful append *)
-val (>>) : 'a -> 'a list ref -> unit
+val (<<) : 'a list ref -> 'a -> unit
 
 (* whitespace split *)
 val split : string -> string list

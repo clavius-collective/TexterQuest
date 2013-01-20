@@ -7,7 +7,7 @@ include Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.trait * (int -> int Mask.mask)
+  | Mask of Trait.trait * (int -> (Trait.stat_mask * int))
 
 type aspect_relation =
   | Create
@@ -21,7 +21,7 @@ type an_effect = {
   volatility  : float;
 }
 
-type effect =
+type spell_effect =
   | Null                                (* no effect *)
   | Incant of string * int              (* compounding spells *)
   | AnEffect of an_effect               (* some effect *)

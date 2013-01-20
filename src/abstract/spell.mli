@@ -7,7 +7,7 @@ open Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.trait * (int -> int Mask.mask)
+  | Mask of Trait.trait * (int -> (Trait.stat_mask * int))
 
 type aspect_relation =
   | Create
@@ -21,7 +21,7 @@ type an_effect = {
   volatility  : float;              (* 0.0-1.0, multiplied by power *)
 }
 
-type effect =
+type spell_effect =
   | Null                                (* no effect *)
   | Incant of string * int              (* compounding spells *)
   | AnEffect of an_effect               (* some effect *)
@@ -31,4 +31,4 @@ val cast :
   Actor.t ->                            (* caster *)
   Object.t ->                           (* target *)
   string ->                             (* spell *)
-  effect list                           (* spell effects *)
+  spell_effect list                     (* spell effects *)
