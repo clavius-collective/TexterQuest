@@ -58,7 +58,7 @@ let all_skills = [
 
 let all_traits = all_aspects @ all_attributes @ all_skills
 
-module StatMask = Mask.T (struct
+module StatMask = Mask.StandardMask (struct
   type acc = int
   type t = stat
   let get_base t = truncate t.value

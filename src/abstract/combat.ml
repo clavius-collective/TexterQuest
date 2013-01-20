@@ -21,7 +21,7 @@ module Tempo = struct
   let set_masks t masks = t.masks <- masks
 end
 
-module TempoMask = Mask.T (Tempo)
+module TempoMask = Mask.StandardMask (Tempo)
 
 type t = {
   mutable tempo         : int;
