@@ -4,33 +4,72 @@
 
 include Util
 
-(*
-
-type t =
-  | Either of Actor.t * any_action
-  | Combat of Actor.t * int * combat_action
-  | NonCombat of Actor.t * noncombat_action
-
-*)
-
 type action =
   | Move of int
   | Cast of string
   | ActionError
 
-type t = Actor.t * action
+type context =
+  | Combat
+  | Noncombat
+  | Either
+
+type t = {
+  actor : Actor.t;
+  action : action;
+  cost : int option;
+}
+
+(*
+ * Some question remains as to how targeting will be represented. Possibly:
+ *   * required list field (can be empty list)
+ *   * list option (not really recommended)
+ *   * folded in as a part of actions that must be targeted
+ *       * as an option, if there are actions which may or may not be targeted
+ *)
+
+let error actor = {
+  actor;
+  action = ActionError;
+  cost = None;
+}
 
 let action_of_string actor input =
-  actor,
-  match Str.bounded_split (Str.regexp "[., \t]+") input 2 with
-    | ["go"; i] -> Move (int_of_string i)
-    | _ -> ActionError
+  let delimiter = Str.regexp "[., \t]+" in
+  let tokens = Str.bounded_split delimiter input 2 in
+  let action, cost = match tokens with
+    | ["go"; i] -> Move (int_of_string i), None
+    | _ -> ActionError, None
+  in
+  {
+    actor;
+    action;
+    cost;
+  }
 
-let string_of_action act = 
-  match act with
-  | actor, (Move i) -> "move " ^ (string_of_int i)
-  | actor, (Cast spell_and_target) -> "cast " ^ spell_and_target
-  | actor, ActionError -> "No action done."
+let string_of_action t = 
+  match t.action with
+    | Move i -> "move " ^ (string_of_int i)
+    | Cast spell_and_target -> "cast " ^ spell_and_target
+    | ActionError -> "No action done."
+        
+let get_cost t = t.cost
 
-let get_actor (actor, _) = actor
-let get_cost t = 0
+let get_actor t = t.actor
+  
+let get_context t = match t.action with
+  | Move _ -> Noncombat
+  | Cast _ -> Combat
+  | ActionError -> Either
+
+let combat_compatible t = match get_context t with
+  | Combat
+  | Either -> true
+  | Noncombat -> false
+
+let noncombat_compatible t = match get_context t with
+  | Noncombat
+  | Either -> true
+  | Combat -> false
+
+let get_action t = t.action

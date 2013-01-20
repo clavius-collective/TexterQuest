@@ -8,8 +8,8 @@ let default params = true
 
 type parameters = {
   ai_actor : Actor.t;
-  room : Room.t;
-  opponent : Actor.t list;
+  room : room_id;
+  opponent : Actor.t list option;
 }
 
 type behavior =
@@ -17,36 +17,49 @@ type behavior =
   | Conditional of ((parameters -> bool) * behavior) list
   | Stochastic of (float * behavior) list
 
-let make_params ~ai_actor ~room ~opponent =
-  {
-    ai_actor;
-    room;
-    opponent;
-  }
+type aggro =
+  | Appear
+  | Target
+  | Harm
+      
+type t = {
+  aggro : aggro;
+  behavior : behavior;
+}
 
 let select_randomly options =
   let roll = Random.float 1.0 in
   let rec maybe_choose current = function
-      | [] ->
-          Act (fun params -> params.ai_actor, Action.ActionError)
-      | (range, behavior)::xs ->
-          if range >= current then
-            behavior
-          else
-            maybe_choose (current -. range) xs
+    | [] ->
+        Act (fun params -> Action.error params.ai_actor)
+    | (range, behavior)::xs ->
+        if range >= current then
+          behavior
+        else
+          maybe_choose (current -. range) xs
   in
   maybe_choose roll options
 
-let rec choose_action parameters = function
-  | Act create_action ->
-      create_action parameters
-  | Conditional choices ->
-      (match choices with
-        | [] -> parameters.ai_actor, Action.ActionError
-        | (cond, behavior)::xs ->
-            if cond parameters then
-              choose_action parameters behavior
-            else
-              choose_action parameters (Conditional xs))
-  | Stochastic choices ->
-      choose_action parameters (select_randomly choices)
+let choose_action  ~ai_actor ~room ~opponent t =
+  let parameters = {
+    ai_actor;
+    room;
+    opponent;
+  } in
+  let rec choose_action' = function
+    | Act create_action ->
+        create_action parameters
+    | Conditional choices ->
+        (match choices with
+          | [] -> Action.error parameters.ai_actor
+          | (cond, behavior)::xs ->
+              if cond parameters then
+                choose_action' behavior
+              else
+                choose_action' (Conditional xs))
+    | Stochastic choices ->
+        choose_action' (select_randomly choices)
+  in
+  choose_action' t.behavior
+
+let when_aggro t = t.aggro

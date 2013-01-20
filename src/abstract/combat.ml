@@ -42,11 +42,10 @@ let locked f x =
 let create actor =
   let generator_function () = 0 in
   let generator = Tempo.create generator_function in
-  let tempo = TempoMask.get_value generator in
   let queued_action = None in
   {
     generator;
-    tempo;
+    tempo = 1;
     queued_action;
   }
 
@@ -69,16 +68,14 @@ let is_in_combat actor =
   with
     | Not_found -> false
 
-let enter_combat' ?(do_lock=true) actor =
-  if do_lock then Mutex.lock lock;
-  (try ignore (lookup actor) with
+let enter_combat' actor =
+  try ignore (lookup actor) with
     | Not_found ->
         let t = create actor in
         Actor.enter_combat actor;
-        Hashtbl.add in_combat actor t);
-  if do_lock then Mutex.unlock lock
-          
-let enter_combat = enter_combat' ~do_lock:false
+        Hashtbl.add in_combat actor t
+
+let enter_combat = locked enter_combat'
 
 let leave_combat = locked (fun actor ->
   Actor.leave_combat actor;
@@ -86,8 +83,11 @@ let leave_combat = locked (fun actor ->
 
 let queue_action = locked (fun action ->
   let actor = Action.get_actor action in
-  let cost = Action.get_cost action in
-  enter_combat' ~do_lock:false actor;
+  let cost = match Action.get_cost action with
+    | Some c -> c
+    | None -> failwith "costless action in combat thread"
+  in
+  enter_combat' actor;
   let t = lookup actor in
   if t.tempo > 0 then
     (t.tempo <- t.tempo - cost;

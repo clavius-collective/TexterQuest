@@ -20,10 +20,10 @@ let submit = locked (fun action ->
 let handle_action action = 
   let open Action in
       let character = Action.get_actor action in
-      Actor.send character (match action with
-        | _, Move i -> Room.move character i
-        | _, Cast spell -> Raw "cast a spell"
-        | _, ActionError -> Raw "INVALID COMMAND")
+      Actor.send character (match Action.get_action action with
+        | Move i -> Room.move character i
+        | Cast spell -> Raw "cast a spell"
+        | ActionError -> Raw "INVALID COMMAND")
 
 let start () =
   debug "mutator starting";

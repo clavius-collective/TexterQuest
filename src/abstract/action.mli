@@ -2,24 +2,31 @@
 (* action.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
+type t
+
 type action =
   | Move of int
   | Cast of string
   | ActionError
 
-type t = Actor.t * action
-
-(* These are two fairly straightforward functions; the second in particular for
-   when NPCs do things. *)
 val action_of_string : Actor.t -> string -> t
 
 val string_of_action : t -> string
 
-(* This is one of what will be a few ways of doing things in the game;
-   this is the most basic, which does not produce any sort of output.
-   It will be useful to have this sometimes, but generally we'll want
-   a description of the t to be generated for the player's benefit. *)
-(* val complete_action : t -> unit *)
-
+(* who's doing the action *)
 val get_actor : t -> Actor.t
-val get_cost : t -> int
+
+(* the tempo cost, if any, of the action *)
+val get_cost : t -> int option
+
+(* whether the action can be used in combat *)
+val combat_compatible : t -> bool
+
+(* whether the action can be used outside of combat *)
+val noncombat_compatible : t -> bool
+
+(* create an error (dummy) action for the actor in question *)
+val error : Actor.t -> t
+
+(* get the actual action (the thing done) *)
+val get_action : t -> action
