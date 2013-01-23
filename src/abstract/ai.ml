@@ -8,7 +8,7 @@ let default params = true
 
 type parameters = {
   ai_actor : Actor.t;
-  room : room_id;
+  room     : room_id;
   opponent : Actor.t list option;
 }
 
@@ -23,7 +23,7 @@ type aggro =
   | Harm
       
 type t = {
-  aggro : aggro;
+  aggro    : aggro;
   behavior : behavior;
 }
 
@@ -40,7 +40,7 @@ let select_randomly options =
   in
   maybe_choose roll options
 
-let choose_action  ~ai_actor ~room ~opponent t =
+let choose_action ~ai_actor ~room ~opponent t =
   let parameters = {
     ai_actor;
     room;

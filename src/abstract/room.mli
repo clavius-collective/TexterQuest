@@ -15,9 +15,9 @@ type t = room_id
  * internal graph of the game map.
  *)
 val create :
-  room_id ->                            (* identifier *)
-  string ->                             (* description *)
-  (room_id * string) array ->           (* exits *)
+  room_id                  ->           (* identifier                        *)
+  string                   ->           (* description                       *)
+  (room_id * string) array ->           (* exits                             *)
   unit
 
 val leave : Actor.t -> unit

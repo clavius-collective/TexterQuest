@@ -45,4 +45,6 @@ let no_debug = ref false
 
 let debug s = if not !no_debug then print_endline (">> " ^ s)
 
+let hash_size = 100
+
 let _ = Random.init (get_time ())

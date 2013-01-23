@@ -5,7 +5,7 @@
 include Util
 
 (* module state *)
-let players = Hashtbl.create 100
+let players = Hashtbl.create hash_size
 let lock = Mutex.create ()
 let locked f x =
     Mutex.lock lock;

@@ -12,10 +12,12 @@ type color = int
 
 type fstring =
   | Raw        of string
+  (* simple formatting *)
   | Bold       of fstring
   | Italic     of fstring
   | Underline  of fstring
   | Color      of color * fstring
+  (* concatenation *)
   | Sections   of fstring list
   | Concat     of fstring list
 
@@ -48,3 +50,6 @@ val no_debug : bool ref
 
 (* debug function that gets turned off by -q flag *)
 val debug : string -> unit
+
+(* the size of the hash tables storing information *)
+val hash_size : int

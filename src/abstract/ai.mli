@@ -12,10 +12,10 @@ type aggro =
   | Harm
 
 val choose_action : 
-  ai_actor : Actor.t ->
-  room : room_id ->
+  ai_actor : Actor.t             ->
+  room     : room_id             ->
   opponent : Actor.t list option ->
-  t ->
+  t                              ->
   Action.t
 
 val when_aggro : t -> aggro

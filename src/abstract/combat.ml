@@ -30,7 +30,7 @@ type t = {
 }
 
 (* module state *)
-let in_combat = Hashtbl.create 100
+let in_combat = Hashtbl.create hash_size
 let running = ref false
 let lock = Mutex.create ()
 let locked f x =

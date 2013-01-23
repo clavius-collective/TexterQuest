@@ -7,17 +7,17 @@ include Util
 type severity =
   | Minor 
   | Middling
-  | Mortifying
+  | Critical
 
 let new_wound ?duration ?(discount=0) severity =
   let now = get_time () in
   let duration = match duration with
     | Some d -> d
-    | None -> (match severity with
+    | None   -> (match severity with
         (* default durations *)
-        | Minor -> 60
+        | Minor    -> 60
         | Middling -> 120
-        | Mortifying -> 360)
+        | Critical -> 360)
   in
   let expire = now + duration - discount in
   severity, expire
@@ -26,6 +26,7 @@ module W = struct
   type acc = (int * int * int)
   type mask = severity
   type t = (mask * int) list ref
+
   let get_base t = (0, 0, 0)
   let get_masks = (!)
   let set_masks t l = t := l
@@ -37,14 +38,14 @@ module W = struct
     else
       let discount = now - expire in
       match severity with
-        | Minor -> None                   (* fully healed *)
+        | Minor -> None                 (* fully healed *)
         | Middling
-        | Mortifying -> 
+        | Critical -> 
             (* serious wounds heal to the next less serious level *)
             let new_severity = (match severity with
               | Minor -> failwith "sanity check failed"
               | Middling -> Minor
-              | Mortifying -> Middling)
+              | Critical -> Middling)
             in
             let (_, new_expire) as wound = (new_wound ~discount new_severity) in
             if new_expire > now then
@@ -54,18 +55,17 @@ module W = struct
               replace wound
 
   let apply_mask (a, b, c) = function
-    | Minor      -> (a + 1, b, c)
-    | Middling   -> (a, b + 1, c)
-    | Mortifying -> (a, b, c + 1)
+    | Minor    -> (a + 1, b, c)
+    | Middling -> (a, b + 1, c)
+    | Critical -> (a, b, c + 1)
 end
 
-module WMask = Mask.WithReplace(W)
-
 include W
+module WMask = Mask.WithReplace(W)
 
 let add_wound t ?duration ?discount severity =
   let wound = new_wound ?duration ?discount severity in
-  t << wound
+  WMask.add_mask t wound
 
 let total_wounds = WMask.get_value
 

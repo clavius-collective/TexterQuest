@@ -11,7 +11,7 @@ type client = file_descr
 
 let prompt = ">>>"
 
-let users = Hashtbl.create 100
+let users = Hashtbl.create hash_size
 let clients = ref []
 
 let send_output sock s =

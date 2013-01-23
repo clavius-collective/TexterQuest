@@ -14,9 +14,18 @@ type room = {
 type t = room_id
 
 (* module state *)
-let rooms = Hashtbl.create 100
+let rooms = Hashtbl.create hash_size
 
-let get = Hashtbl.find rooms
+let get id = 
+  try
+    Hashtbl.find rooms id
+  with
+    | Not_found -> 
+        (* let fields = db_lookup id in *)
+        (* let room = room_of_db fields in *)
+        (* Hashtbl.add rooms id room *)
+        (* room *)
+        failwith "implement the damn database already"
 
 let create id description exits =
   let room = {
@@ -28,6 +37,8 @@ let create id description exits =
   Hashtbl.add rooms id room
 
 let get_exit id i = fst (get id).exits.(i - 1)
+
+let get_description id = Raw (get id).description
 
 let list_actors id =
   let actors = (get id).actors in
@@ -46,7 +57,7 @@ let list_exits id =
     
 let describe id =
   Sections [
-    Raw (get id).description;
+    get_description id;
     list_actors id;
     list_exits id;
   ]

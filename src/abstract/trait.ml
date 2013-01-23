@@ -99,7 +99,7 @@ let check vec coeffs =
   truncate (List.fold_left add 0.0 coeffs)
 
 let combine_vectors vectors =
-  let rec combine_pair acc left right = match left with
+  let rec combine_two_vectors acc left right = match left with
     | [] ->
         acc @ right
     | (trait, value)::left_rem ->
@@ -111,4 +111,4 @@ let combine_vectors vectors =
         in
         combine_pair ((trait, total)::acc) left_rem right_rem
   in
-  List.fold_left (combine_pair []) [] (List.map all_values vectors)
+  List.fold_left (combine_two_vectors []) [] (List.map all_values vectors)
