@@ -28,23 +28,69 @@ type spell_effect =
   | End                                 (* spell ended *)
 
 type syllable =
+  | Any_syllable                        (* _ hack for combination list *)
   | No                                  (* null syllable *)
   | Erk                                 (* error syllable *)
                                                                                
+let syllable_of_string s = match String.lowercase s with
+  | "no" -> No
+  | "_" -> Any_syllable
+  | _ -> Erk
+
 let spell_of_string s =
-  let syllable_of_string s = match String.lowercase s with
-    | "no" -> No
-    | _ -> Erk
-  in
   let parts = split s in
   List.map syllable_of_string parts
 
-(* helper function to determine spell effects based on
-   each subsequence of three syllables in the spell *)
-let generate_effect = function
-  | No, No, No -> Null
-  (* cases for different syllables/effects *)
-  | _ -> End
+let lock = Mutex.create ()
+let combinations = ref [
+  No, [No, [No, [Null]]];
+]
+
+let locked f x =
+  Mutex.lock lock;
+  let value = f x in
+  Mutex.unlock lock;
+  value
+
+let generate_effect = locked (fun (syl1, syl2, syl3) ->
+  let lookup elt collection =
+    try
+      List.assoc elt collection
+    with
+      | Not_found -> []
+  in
+  let of_syl syl lst = lookup syl lst @ lookup Any_syllable lst in
+  match of_syl syl3 (of_syl syl2 (of_syl syl1 !combinations)) with
+    | [] -> Null
+    | first_match::_ -> first_match)
+
+let add_effect = locked (fun str1 str2 str3 effect ->
+  let syl1 = match syllable_of_string str1 with 
+    | Erk -> failwith ("mangled syllable: " ^ str1)
+    | s -> s
+  and syl2 = match syllable_of_string str2 with
+    | Erk -> failwith ("mangled syllable: " ^ str2)
+    | s -> s
+  and syl3 = match syllable_of_string str3 with
+    | Erk -> failwith ("mangled syllable: " ^ str3)
+    | s -> s
+  in
+  let rec add_third = function
+    | (s, _)::xs when s = syl3    -> (syl3, [effect])::xs
+    | x::xs                       -> x::(add_third xs)
+    | []                          -> [syl3, [effect]]
+  in
+  let rec add_second = function
+    | (s, next)::xs when s = syl2 -> (syl2, add_third next)::xs
+    | x::xs                       -> x::(add_second xs)
+    | []                          -> [syl2, [syl3, [effect]]]
+  in
+  let rec add_first = function
+    | (s, next)::xs when s = syl1 -> (syl1, add_second next)::xs
+    | x::xs                       -> x::(add_first xs)
+    | []                          -> [syl1, [syl2, [syl3, [effect]]]]
+  in
+  combinations := add_first !combinations)
 
 (* Ignore subsequences with no effect, truncate effects
    list if an end sequence occurred. *)

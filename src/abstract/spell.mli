@@ -23,12 +23,27 @@ type an_effect = {
 
 type spell_effect =
   | Null                                (* no effect *)
-  | Incant of string * int              (* compounding spells *)
+  | Incant   of string * int            (* compounding spells *)
   | AnEffect of an_effect               (* some effect *)
   | End                                 (* spell ended *)
 
 val cast :
-  Actor.t ->                            (* caster *)
+  Actor.t  ->                           (* caster *)
   Object.t ->                           (* target *)
-  string ->                             (* spell *)
+  string   ->                           (* spell *)
   spell_effect list                     (* spell effects *)
+
+(*
+ * Given the names of three syllables and a spell effect, associate the effect
+ * given with those syllables, in that order. If more than one of the patterns
+ * added matches a sequence of syllables in a given spell, the one that gets
+ * applied is based on specificity of the pattern. Patterns that accept only
+ * one syllable in the first slot will take precedence over those accepting any
+ * syllable, then likewise for the second and third slots.
+ * 
+ * RAISES AN EXCEPTION if any of the syllables is mangled.
+ *)
+val add_effect :
+  string -> string -> string ->        (* the syllables in question *)
+  spell_effect ->                      (* the effect to result *)
+  unit

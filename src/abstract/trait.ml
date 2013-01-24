@@ -109,6 +109,6 @@ let combine_vectors vectors =
           with
             | Not_found -> value, right
         in
-        combine_pair ((trait, total)::acc) left_rem right_rem
+        combine_two_vectors ((trait, total)::acc) left_rem right_rem
   in
   List.fold_left (combine_two_vectors []) [] (List.map all_values vectors)
