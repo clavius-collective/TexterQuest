@@ -7,7 +7,7 @@ include Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.trait * (int -> (Trait.stat_mask * int))
+  | Mask of Trait.t * (int -> (Vector.stat_mask * int))
 
 type aspect_relation =
   | Create
@@ -15,7 +15,7 @@ type aspect_relation =
   | Manipulate of manipulation
 
 type an_effect = {
-  aspect      : Trait.aspect;
+  aspect      : Aspect.t;
   interaction : aspect_relation;
   power       : int;
   volatility  : float;
@@ -65,15 +65,13 @@ let generate_effect = locked (fun (syl1, syl2, syl3) ->
     | first_match::_ -> first_match)
 
 let add_effect = locked (fun str1 str2 str3 effect ->
-  let syl1 = match syllable_of_string str1 with 
-    | Erk -> failwith ("mangled syllable: " ^ str1)
+  let get_syllable str = match syllable_of_string str with
+    | Erk -> failwith ("mangled syllable: " ^ str)
     | s -> s
-  and syl2 = match syllable_of_string str2 with
-    | Erk -> failwith ("mangled syllable: " ^ str2)
-    | s -> s
-  and syl3 = match syllable_of_string str3 with
-    | Erk -> failwith ("mangled syllable: " ^ str3)
-    | s -> s
+  in
+  let syl1, syl2, syl3 = match List.map get_syllable [str1; str2; str3] with
+    | [a; b; c] -> a, b, c
+    | _ -> failwith "sanity check failed"
   in
   let rec add_third = function
     | (s, _)::xs when s = syl3    -> (syl3, [effect])::xs

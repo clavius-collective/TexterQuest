@@ -9,7 +9,11 @@ OCAMLPACKS[] =
 ABSTRACT_FILES[] =
 	util
 	mask
+	aspect
+	attribute
+	skill
 	trait
+	vector
 	wound
 	item
 	actor

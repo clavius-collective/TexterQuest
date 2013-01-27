@@ -14,7 +14,7 @@ type combat_stats = {
 type t = {
   name             : string;
   wounds           : Wound.t;
-  traits           : Trait.vector;
+  traits           : Trait.t Vector.t;
   send             : fstring -> unit;
   mutable combat   : combat_stats option;
   mutable location : room_id;  
@@ -36,7 +36,7 @@ let create ~wounds ~traits ~send ~location name  =
 
 let create_new = create
   ~wounds:(Wound.create ())
-  ~traits:(Trait.create_traits ())
+  ~traits:(Vector.create ())
   ~location:initial_location
 
 let get_name t = t.name

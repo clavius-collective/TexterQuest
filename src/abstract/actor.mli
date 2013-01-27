@@ -13,7 +13,7 @@ type t
 
 val create :
   wounds   : Wound.t           ->
-  traits   : Trait.vector      ->
+  traits   : Trait.t Vector.t  ->
   send     : (fstring -> unit) ->       (* send *)
   location : room_id           ->       (* location *)
   string                       ->       (* name *)

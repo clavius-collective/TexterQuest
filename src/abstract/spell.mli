@@ -7,7 +7,7 @@ open Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.trait * (int -> (Trait.stat_mask * int))
+  | Mask of Trait.t * (int -> (Vector.stat_mask * int))
 
 type aspect_relation =
   | Create
@@ -15,7 +15,7 @@ type aspect_relation =
   | Manipulate of manipulation
 
 type an_effect = {
-  aspect      : Trait.aspect;       (* the key element *)
+  aspect      : Aspect.t;           (* the key element *)
   interaction : aspect_relation;    (* the actual effect *)
   power       : int;                (* raw power *)
   volatility  : float;              (* 0.0-1.0, multiplied by power *)
