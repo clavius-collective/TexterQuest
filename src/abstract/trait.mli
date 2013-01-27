@@ -9,3 +9,7 @@ type t = [
 | `Attribute of Attribute.t
 | `Skill     of Skill.t
 ]
+
+val trait_of_aspect    : Aspect.t    -> t
+val trait_of_attribute : Attribute.t -> t
+val trait_of_skill     : Skill.t     -> t
