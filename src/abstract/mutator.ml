@@ -14,6 +14,7 @@ let locked f x =
   value
 
 let submit = locked (fun action ->
+  debug ("action submitted for " ^ (Actor.get_name (Action.get_actor action)));
   Queue.add action actions;
   Condition.signal condition)
 

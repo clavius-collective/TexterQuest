@@ -17,7 +17,7 @@ type t = {
   traits           : Trait.t Vector.t;
   send             : fstring -> unit;
   mutable combat   : combat_stats option;
-  mutable location : room_id;  
+  mutable location : room_id;
 }
 
 (* 

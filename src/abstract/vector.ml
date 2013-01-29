@@ -2,39 +2,46 @@
 (* vector.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-type stat_mask = int -> int
+include Util
+
+type mask = int Mask.mask
 
 type stat = {
   mutable value : float;
-  mutable masks : (stat_mask * int) list
+  mutable masks : mask list
 }
 
-type 'a t = ('a * stat) list
+type 'a t = ('a * stat) list ref
 
-module StatMask = Mask.StandardMask (struct
-  type acc = int
+module StatMask = Mask.Mask (struct
   type t = stat
-  let get_base t = truncate t.value
+  type acc = int
+  let get_acc t = truncate t.value
   let get_masks t = t.masks
   let set_masks t m = t.masks <- m
 end)
 
 let new_stat ?(value = 0.0) ?(masks = []) () = { value; masks; }
 
-let lookup vec trait =
-  try List.assoc trait vec
-  with Not_found -> new_stat ()
+let lookup t trait =
+  try 
+    List.assoc trait !t
+  with 
+    | Not_found ->
+        let s = new_stat () in
+        t := (trait, s)::!t;
+        s
 
-let mask vec trait mask =
+let add_mask vec trait mask =
   let stat = (lookup vec trait) in
   StatMask.add_mask stat mask
 
 let raw_value vec trait = truncate (lookup vec trait).value
 let get_value vec trait = StatMask.get_value (lookup vec trait)
-let all_values vec = List.map (fun (t, v) -> t, StatMask.get_value v) vec
+let all_values t = List.map (fun (trait, v) -> trait, StatMask.get_value v) !t
 
 let create ?(initial = []) traits =
-  List.map (fun (trait, value) -> trait, new_stat ~value ()) initial
+  ref (List.map (fun (trait, value) -> trait, new_stat ~value ()) initial)
 
 let check vec coeffs =
   let add total (trait, coeff) =

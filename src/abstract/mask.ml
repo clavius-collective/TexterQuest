@@ -1,73 +1,120 @@
-(* Copyright (C) 2013 Ben Lewis and David Donna *)
-(* mask.ml, part of TexterQuest *)
-(* LGPLv3 *)
-
 include Util
 
-module type MASKED = sig
+(*
+ * After a brief time as an abstract type, wounds have been restored to a
+ * relation on the accumulator type. (That is, the type returned by get_value,
+ * e.g. int for stats.)
+ *)
+type 'a transform = 'a -> 'a
+
+(* 
+ * Function that will return whatever form the mask has, or None if the mask
+ * has simply expired. An example would be a wound's decay function returning a
+ * less serious wound after it has healed for some time.
+ *)
+type 'a decay = 'a mask -> 'a mask option
+
+and 'a mask = {
+  description : string;
+  transform   : 'a -> 'a;
+  decay       : 'a decay;
+}
+
+(* 
+ * possible TODO: add
+ *   type mask'
+ *   val application_of_mask' : mask' -> 'a mask
+ * (with the names changed around so that it makes more sense)
+ *)
+module type MASKABLE = sig
   type t
   type acc
-  type mask
-  val add_mask  : t -> mask * int -> unit
+  val get_acc   : t -> acc
+  val get_masks : t -> acc mask list
+  val set_masks : t -> acc mask list -> unit
+end
+
+module type MASK = sig
+  type t
+  type acc
+
+  val expires_after : int -> acc decay
+
+  val compose :
+    ?defer_same   : bool ->
+    ?defer_change : bool ->
+    ?defer_none   : bool ->
+    acc decay            ->
+    acc decay            ->
+    acc decay
+
+  val create    :
+    description : string        ->
+    transform   : acc transform ->
+    decay       : acc decay     ->
+    acc mask
+
+  val add_mask  : t -> acc mask -> unit
+
   val get_value : t -> acc
 end
 
-module WithReplace = functor (M : sig
-  type t
-  type acc
-  type mask
-  val get_base : t -> acc
-  val get_masks : t -> (mask * int) list
-  val set_masks : t ->  (mask * int) list -> unit
-  val apply_mask : acc -> mask -> acc
-  val replace : (mask * int) -> (mask * int) option
-end) -> struct
+module Mask = functor (M : MASKABLE) -> struct
   include M
+        
+  let expires_after duration =
+    let expiration = get_time () + duration in
+    (fun mask ->
+      let now = get_time () in
+      if now < expiration then Some mask else None)
 
-  let add_mask t (mask, duration) =
-    let expire = duration + get_time () in
-    M.set_masks t ((mask, expire)::(M.get_masks t))
+  let compose
+      ?(defer_same   = false)
+      ?(defer_change = false)
+      ?(defer_none   = false)
+      decay decay' mask =
+    match decay mask with
+      | Some mask' when mask' == mask ->
+          if defer_same   then decay' mask' else Some mask'
+      | Some mask' ->
+          if defer_change then decay' mask' else Some mask'
+      | None ->
+          if defer_none   then decay' mask  else None
+
+  let decays_after duration = compose ~defer_none:true (expires_after duration)
+
+  let check_decay mask = mask.decay mask
 
   let get_value t =
-    let time = get_time () in
     let final_val, active =
       List.fold_right
-        (fun ((mask, expire) as timed) (total, active) ->
-          if expire > time then
-            M.apply_mask total mask, timed::active
-          else
-            match M.replace timed with
-              | Some ((mask, _) as timed) ->
-                  M.apply_mask total mask, timed::active
-              | None -> total, active)
+        (fun mask (current, active) ->
+          match check_decay mask with
+            | None -> current, active
+            | Some mask -> mask.transform current, mask::active)
         (M.get_masks t)
-        (M.get_base t, [])
+        (M.get_acc t, [])
     in
     M.set_masks t active;
     final_val
+
+  let create ~description ~transform ~decay =
+    {
+      description;
+      transform;
+      decay;
+    }
+
+  let add_mask t mask =
+    M.set_masks t (mask::(M.get_masks t))
 end
 
-module WithMask = functor (M : sig
+module Identity_acc = functor (M : sig
   type t
-  type acc
-  type mask
-  val get_base : t -> acc
-  val get_masks : t -> (mask * int) list
-  val set_masks : t -> (mask * int) list -> unit
-  val apply_mask : acc -> mask -> acc
-end) -> WithReplace (struct
+  val get_masks : t -> t mask list
+  val set_masks : t -> t mask list -> unit
+end) -> Mask (struct
   include M
-  let replace mask = None
-end)
-
-module StandardMask = functor (M : sig
-  type t
-  type acc
-  val get_base : t -> acc
-  val get_masks : t -> ((acc -> acc) * int) list
-  val set_masks : t -> ((acc -> acc) * int) list -> unit
-end) -> WithMask (struct
-  include M
-  type mask = M.acc -> M.acc
-  let apply_mask acc mask = mask acc
+  type acc = t
+  let get_acc t = t
 end)

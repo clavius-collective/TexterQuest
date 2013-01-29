@@ -7,7 +7,7 @@ open Util
 type manipulation =
   | Damage
   | Heal
-  | Mask of Trait.t * (int -> (Vector.stat_mask * int))
+  | Mask of Trait.t * Vector.mask
 
 type aspect_relation =
   | Create

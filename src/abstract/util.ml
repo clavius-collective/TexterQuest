@@ -2,6 +2,9 @@
 (* types.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
+open Sexplib
+open Sexplib.Std
+
 (* fundamental data types *)
 type room_id = string
 

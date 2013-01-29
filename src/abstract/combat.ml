@@ -4,11 +4,13 @@
 
 include Util
 
+type mask = int Mask.mask
+
 module Tempo = struct
   type acc = int
   type t = {
     generate_tempo : unit -> int;
-    mutable masks  : ((acc -> acc) * int) list;
+    mutable masks  : mask list;
   }
 
   let create generator = {
@@ -16,12 +18,12 @@ module Tempo = struct
     masks = [];
   }
 
-  let get_base t : int = t.generate_tempo ()
+  let get_acc t : int = t.generate_tempo ()
   let get_masks t = t.masks
   let set_masks t masks = t.masks <- masks
 end
 
-module TempoMask = Mask.StandardMask (Tempo)
+module TempoMask = Mask.Mask (Tempo)
 
 type t = {
   mutable tempo         : int;

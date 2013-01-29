@@ -1,62 +1,46 @@
-(* Copyright (C) 2013 Ben Lewis and David Donna *)
-(* mask.mli, part of TexterQuest *)
-(* LGPLv3 *)
+type 'a mask
+type 'a transform = 'a -> 'a
+type 'a decay = 'a mask -> 'a mask option
 
-open Util
+module type MASKABLE = sig
+  type t
+  type acc
+  val get_acc : t -> acc
+  val get_masks : t -> acc mask list
+  val set_masks : t -> acc mask list -> unit
+end
 
-module type MASKED = sig
-  type t                                (* the basic object *)
-  type acc                              (* the type of the "value" *)
-  type mask                             (* the type of the temporary mask *)
+module type MASK = sig
+  type t
+  type acc
 
-  (* Statefully adds the mask given, with its duration. *)
-  val add_mask  : t -> mask * int -> unit
+  val expires_after : int -> acc decay
 
-  (* Returns the "current value", factoring in all active masks. *)
+  val compose :
+    ?defer_same   : bool ->
+    ?defer_change : bool ->
+    ?defer_none   : bool ->
+    acc decay            ->
+    acc decay            ->
+    acc decay
+
+  val create :
+    description : string        ->
+    transform   : acc transform ->
+    decay       : acc decay     ->
+    acc mask
+
+  val add_mask  : t -> acc mask -> unit
+
   val get_value : t -> acc
 end
 
-(*
- * Provides masking functionality for a module, where the mask type is simply
- * a relation on the accumulator type.
- *)
-module StandardMask : functor (M : sig
-  type t
-  type acc
-  val get_base : t -> acc
-  val get_masks : t -> ((acc -> acc) * int) list
-  val set_masks : t -> ((acc -> acc) * int) list -> unit
-end) ->
-(MASKED with type t = M.t and type acc = M.acc and type mask = M.acc -> M.acc)
+module Mask : functor (M : MASKABLE) ->
+  (MASK with type t = M.t and type acc = M.acc)
 
-(*
- * Provides masking functionality with a given mask type, not necessarily a
- * relation on the accumulator type. Like StandardMask, except requires the
- * mask type, and an apply_mask function.
- *)
-module WithMask : functor (M : sig
+module Identity_acc : functor (M : sig
   type t
-  type acc
-  type mask
-  val get_base : t -> acc
-  val get_masks : t -> (mask * int) list
-  val set_masks : t -> (mask * int) list -> unit
-  val apply_mask : acc -> mask -> acc
+  val get_masks : t -> t mask list
+  val set_masks : t -> t mask list -> unit
 end) ->
-(MASKED with type t = M.t and type acc = M.acc and type mask = M.mask)
-
-(* 
- * All features are provided, including a function that takes an expired mask
- * and potentially replaces it with another.
- *)
-module WithReplace : functor (M : sig
-  type t
-  type acc
-  type mask
-  val get_base  : t -> acc
-  val get_masks : t -> (mask * int) list
-  val set_masks : t -> (mask * int) list -> unit
-  val apply_mask : acc -> mask -> acc
-  val replace   : (mask * int) -> (mask * int) option
-end) ->
-(MASKED with type t = M.t and type acc = M.acc and type mask = M.mask)
+  (MASK with type t = M.t and type acc = M.t)

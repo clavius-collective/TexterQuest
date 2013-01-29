@@ -1,12 +1,18 @@
-.PHONY: clean
+BYTE_ENABLED = true
+NATIVE_ENABLED = true
+OCAMLDEPFLAGS += -syntax camlp4o
+OCAMLFLAGS += -thread -syntax camlp4o
 
-OCAMLFLAGS += -thread
-
+USE_OCAMLFIND = true
 OCAMLPACKS[] =
 	str
 	threads
+	type_conv
+	bin_prot
+	sexplib
+	sexplib.syntax
 
-ABSTRACT_FILES[] =
+FILES[] =
 	util
 	mask
 	aspect
@@ -27,4 +33,4 @@ ABSTRACT_FILES[] =
 	combat
 	listener
 
-.DEFAULT: $(OCamlLibrary libabstract, $(ABSTRACT_FILES))
+.DEFAULT: $(OCamlLibrary libabstract, $(FILES))

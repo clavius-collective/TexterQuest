@@ -1,3 +1,7 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* attribute.ml, part of TexterQuest *)
+(* LGPLv3 *)
+
 type t =
   | Hardiness
   | Might
@@ -10,3 +14,4 @@ type t =
   | Concentration
   | Intuition
   | Clarity
+

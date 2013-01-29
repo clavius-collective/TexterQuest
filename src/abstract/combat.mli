@@ -9,7 +9,7 @@
  *)
 
 val start : unit -> unit
-val stop : unit -> unit
+val stop  : unit -> unit
 
 (*
  * Queue up an action. If the user has tempo, it will be submitted immediately

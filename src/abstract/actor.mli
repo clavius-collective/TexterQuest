@@ -30,7 +30,7 @@ val get_loc : t -> room_id
 
 val set_loc : t -> room_id -> unit
 
-val add_wound : t -> ?duration:int -> ?discount:int -> Wound.severity -> unit
+val add_wound : t -> ?delay:int -> Wound.severity -> unit
 
 val is_defeated : t -> bool
 

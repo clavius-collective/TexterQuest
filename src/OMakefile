@@ -9,16 +9,18 @@ OCAMLFLAGS += -thread
 
 PROGRAM = test
 
+OCAMLPACKS[] =
+	unix
+	str
+	threads
+	sexplib
+	sexplib.syntax
+
 OCAML_LIBS[] =
 	abstract/libabstract
 	server/libserver
 
 OCAMLINCLUDES += $(dir abstract server)
-
-OCAML_OTHER_LIBS[] =
-	unix
-	str
-	threads
 
 FILES[] =
 	main

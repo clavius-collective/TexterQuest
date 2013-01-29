@@ -13,13 +13,13 @@
  *)
 type 'a t
 
-type stat_mask = int -> int
+type mask = int Mask.mask
 
 (* Temporarily modify the value of a trait.                                  *)
-val mask :
+val add_mask :
   'a t               ->      (* the traits of the object in question         *)
   'a                 ->      (* the id of the trait getting masked           *)
-  (int -> int) * int ->      (* the effect (e.g. (+) 2 to increase by 2)     *)
+  mask               ->      (* the effect (e.g. (+) 2 to increase by 2)     *)
   unit
 
 (* Look up the "visible" value of the trait for a given object's vector.     *)
