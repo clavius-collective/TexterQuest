@@ -1,11 +1,27 @@
+(* Copyright (C) 2013 Ben Lewis and David Donna *)
+(* mask.mli, part of TexterQuest *)
+(* LGPLv3 *)
+
 type 'a mask
+
+(*
+ * After a brief time as an abstract type, wounds have been restored to a
+ * relation on the accumulator type. (That is, the type returned by get_value,
+ * e.g. int for stats.)
+ *)
 type 'a transform = 'a -> 'a
+
+(* 
+ * Function that will return whatever form the mask has, or None if the mask
+ * has simply expired. An example would be a wound's decay function returning a
+ * less serious wound after it has healed for some time.
+ *)
 type 'a decay = 'a mask -> 'a mask option
 
 module type MASKABLE = sig
   type t
   type acc
-  val get_acc : t -> acc
+  val get_acc   : t -> acc
   val get_masks : t -> acc mask list
   val set_masks : t -> acc mask list -> unit
 end
@@ -35,7 +51,7 @@ module type MASK = sig
   val get_value : t -> acc
 end
 
-module Mask : functor (M : MASKABLE) ->
+module Make : functor (M : MASKABLE) ->
   (MASK with type t = M.t and type acc = M.acc)
 
 module Identity_acc : functor (M : sig

@@ -11,6 +11,9 @@ type severity =
 (* the object that tracks a given actor's wounds                             *)
 type t
 
+(* type representing the severity (and eventually location, etc.) of wounds  *)
+type wound_info = (int * int * int)
+
 val create : unit -> t
 
 (* adds a wound                                                              *)
@@ -21,4 +24,4 @@ val add_wound :
   unit
 
 (* return the total number of wounds at each degree of severity (increasing) *)
-val total_wounds : t -> (int * int * int)
+val total_wounds : t -> wound_info

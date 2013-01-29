@@ -13,7 +13,7 @@ type stat = {
 
 type 'a t = ('a * stat) list ref
 
-module StatMask = Mask.Mask (struct
+module StatMask = Mask.Make (struct
   type t = stat
   type acc = int
   let get_acc t = truncate t.value
