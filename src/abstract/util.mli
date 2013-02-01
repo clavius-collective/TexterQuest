@@ -53,3 +53,6 @@ val debug : string -> unit
 
 (* the size of the hash tables storing information *)
 val hash_size : int
+
+(* filter a list of options to just get the real ones *)
+val take_some : 'a option list -> 'a list

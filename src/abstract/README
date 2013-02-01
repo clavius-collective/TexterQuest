@@ -1,0 +1,169 @@
+###########
+# MODULES #
+###########
+
+* Util
+  Basic utility functions. The room_id and username types (both simple
+  strings) are defined here, then a bunch of random functions.
+
+* Mask
+  Masking is the fundamental way that things are changed. Any object
+  that uses the mask functor is responsible for keeping track of its
+  own masks; the functor requires that get_masks and set_masks be
+  provided. An important distinction is between t an acc types. The t
+  is the record that keeps track of masks and such; the acc is the
+  value that masks act on.
+
+  A relevant todo involves tagging masks, so that outside factors can
+  act on them. For example, a healing effect could go through and
+  affect all relevant wound masks, or all masks inflicted by frost
+  effects, or what have you.
+
+* Trait - combination type for aspects, attributes, and skills.
+  It's possible - nay, likely - that more modules will eventually be
+  folded into the Trait type. Eventually, the goal could be to make
+  some sort of universal trait accessor, to make getting and setting
+  easier for, say, scripting.  
+
+  * Aspect
+    Aspects can be one of the core aspects, but also a "higher-order"
+    aspect, defined by it associations with other aspects. So a "Fish"
+    aspect would be composed of water and bio associations. Since this
+    is modelled as a coefficient vector, it's possible for the total
+    "power" of a higher-order aspect to be higher or lower than
+    1.0. On the off-chance that we need to, there's a function to
+    normalize the power of a higher-order aspect by adjusting the
+    coefficients.
+
+    This module will also have logic determining which aspects
+    conflict, how difficult that conflict is to resolve, and what a
+    successful synthesis of two conflicting aspects might be.
+  
+  * Attribute
+    A la Elder Scrolls. It isn't more complex than that yet.
+
+  * Skill
+    A la d20 systems. Again, right now it's just that simple.
+
+* Vector
+  List associating some kind of key type (e.g. aspect) to a "stat,"
+  which is a mutable float that 
+
+* Wound
+  Pretty straightforward. Wounds don't actually deal with Actors.
+  Instead, the module exports a Wound.t, which is plugged in as an
+  attribute to the Actor module. A Wound.t is masked to keep track of
+  wounds as they are inflicted and healed.
+
+* Object - combination type for items, actors, and rooms (see below). 
+  Importantly, any object might have hooks, which encode things that
+  are triggered under certain circumstances, by certain actions or
+  effects. The code for hooks isn't there yet; see Context below for
+  more information.
+
+  * Item
+    Important things that we know about items: they'll have aspect
+    affinities, and they can be contained in rooms, carried by actors,
+    or actually wielded by actors.
+
+  * Actor
+    At some point, I suspect that some form of acc record will have to
+    be designed for actors, so that they can be masked coherently. As
+    it is, individual traits are masked (via the Vector module), but
+    that doesn't really give us the kind of power and flexibility that
+    we want.
+
+  * Room
+    The most noteworthy thing here is that rooms are not stored
+    outside as actual room records, but as room_id identifiers. This
+    is because a) rooms need to be defined after other objects, so
+    that they can contain those objects, and b) the room module
+    entirely encapsulates the process of storing empty rooms, and
+    loading rooms as players enter them.
+
+    Spawning information for AI actors and static NPCs will probably
+    also be stored in here somewhere. Most likely as sexp-serialized
+    scriptymajigs that get stored in the database.
+
+* Spell
+  Starts off as a list of strings. These get translated into
+  syllables, and the list of syllables is processed to generate a list
+  of spell effects in the "Context" phase (see below). The list of
+  spell effects is then processed, in the terms of who's casting the
+  spell, their target(s), and the environment to get the actual
+  effects of the spell (the "Effect" phase, again described below).
+
+  One big TODO here is building a record to associate with a syllable,
+  which will determine the dynamically determined effects of syllabic
+  interaction for cases where the syllables don't match a predefined
+  pattern. Then, of course, writing the logic for exactly how
+  intermediate spell effects interact, and all that fun stuff.
+
+###########
+# ACTIONS #
+###########
+
+* Action
+  Represents a command/action attempted by an actor. It will have some
+  basic structure, based on what is being attempted. However, only
+  very superficial analysis is done. (Targets are just string names,
+  and not actual Object.t instances, etc.) The next step in the life
+  cycle of an action is the Context.t.  
+
+( Context )
+  This module doesn't exist yet; the idea is that it will be the
+  missing link between an Action.t and an Effect.t. Whereas the action
+  will have the targets, etc. given as strings, the context will have
+  actual game objects. Thus, the construction of a Context record will
+  be the guarantee of an action's validity.
+
+  The Context module will hold all of the relevant aspects of an
+  action: who is acting, what the target(s) is/are, which room it
+  takes place in, other objects that might be present. Processing a
+  Context will include figuring out which hooks of which objects
+  apply, based on all of the elements present, and their respective
+  roles in the action.
+
+* Effect
+  Basically a placeholder right now. Eventually, actions are going to
+  be translated into effects, which will somehow encompass other
+  effects that they trigger, and carry their own description in
+  fstring form, and either Effect or Mutator will have code to mutate
+  the game state accordingly.
+
+  The result of this rigmarole will be an Effect.t, which will then be
+  executed and described to everyone involved.
+
+##############
+# GAME LOGIC #
+##############
+
+* Ai
+  The t record will correspond to a pattern of behaviour for an AI
+  actor; the functions will be queried by some thread (not sure which
+  yet) to determine what actions the actor takes. It is critical that
+  this record be immutable; the idea is to have the record be a
+  behavioural template from which any actors that behave alike can
+  take their cues.
+
+  The glaring omission at this point is some sort of conversation
+  type. It will happen... eventually.
+
+* Mutator
+  Sets up a thread that waits for actions to be submitted, then
+  translates them into effects and executes them. It's in a really
+  vague place right now; handle_action is going to need to be fleshed
+  out a great deal.
+
+* Combat
+  Sets up a thread that will listen and wait for actors to enter
+  combat. When they do, it stores a record and begins giving that
+  actor tempo. At some later point, they can be removed from
+  combat. When an action is used by an actor in combat, the action is
+  submitted to the combat thread instead of the mutator. The combat
+  thread will then submit the action when the actor has enough tempo
+  for it.
+
+* Listener
+  This is the main reactor module for the abstract game. It's the
+  point of contact for the actual servers.

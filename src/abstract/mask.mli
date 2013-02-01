@@ -36,8 +36,7 @@ module type MASKABLE = sig
 end
 
 module type MASK = sig
-  type t
-  type acc
+  include MASKABLE
 
   (*
    * Create a simple decay function that will leave a mask unchanged until the

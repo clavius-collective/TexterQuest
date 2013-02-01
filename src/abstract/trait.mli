@@ -4,11 +4,11 @@
 
 open Util
 
-type t = [
-  `Aspect    of Aspect.t
-| `Attribute of Attribute.t
-| `Skill     of Skill.t
-]
+type t =
+| TAspect    of Aspect.t
+| TAttribute of Attribute.t
+| TSkill     of Skill.t
+
 
 val trait_of_aspect    : Aspect.t    -> t
 val trait_of_attribute : Attribute.t -> t

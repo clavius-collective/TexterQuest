@@ -23,8 +23,12 @@ module type MASKABLE = sig
 end
 
 module type MASK = sig
-  type t
-  type acc
+
+  (*
+   * Including the result of a Mask functor will also include the
+   * module to which the fuctor was applied.
+   *)
+  include MASKABLE
 
   val expires_after : int -> acc decay
 
@@ -36,7 +40,7 @@ module type MASK = sig
     acc decay            ->
     acc decay
 
-  val create    :
+  val create :
     description : string        ->
     transform   : acc transform ->
     decay       : acc decay     ->

@@ -2,12 +2,11 @@
 (* trait.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-type t = [
-  `Aspect    of Aspect.t
-| `Attribute of Attribute.t
-| `Skill     of Skill.t
-]
+type t =
+  | TAspect    of Aspect.t
+  | TAttribute of Attribute.t
+  | TSkill     of Skill.t
 
-let trait_of_aspect aspect = `Aspect aspect
-let trait_of_attribute attribute = `Attribute attribute
-let trait_of_skill skill = `Skill skill
+let trait_of_aspect aspect = TAspect aspect
+let trait_of_attribute attribute = TAttribute attribute
+let trait_of_skill skill = TSkill skill

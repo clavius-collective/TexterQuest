@@ -22,6 +22,7 @@ let handle_action action =
   let open Action in
       let character = Action.get_actor action in
       Actor.send character (match Action.get_action action with
+        (* TODO: realify this shit. *)
         | Move i -> Room.move character i
         | Cast spell -> Raw "cast a spell"
         | ActionError -> Raw "INVALID COMMAND")
