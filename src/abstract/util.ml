@@ -56,3 +56,12 @@ let rec take_some = function
   | (Some x)::xs -> x::(take_some xs)
 
 let _ = Random.init (get_time ())
+
+let (|?) x y = match x with
+  | None -> y
+  | Some x -> x
+
+module type DESCRIBE = sig
+  type t
+  val describe : t -> fstring
+end

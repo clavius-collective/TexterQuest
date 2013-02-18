@@ -56,3 +56,10 @@ val hash_size : int
 
 (* filter a list of options to just get the real ones *)
 val take_some : 'a option list -> 'a list
+
+val (|?) : 'a option -> 'a -> 'a
+
+module type DESCRIBE = sig
+  type t
+  val describe : t -> fstring
+end

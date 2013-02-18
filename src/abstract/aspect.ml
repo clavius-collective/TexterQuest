@@ -99,3 +99,18 @@ let normalize ?(target=1.0) t = match t with
         h.components
       in
       Higher { h with components = new_components }
+
+let affinities vec =
+  let results = ref [] in
+  let rec update (t, value) = match t with
+    | Core _ as c -> 
+        (try
+           let v = List.assoc c !results in
+           results := (c, value +. v)::(List.remove_assoc c !results)
+         with
+           | Not_found -> results := (c, value)::!results)
+    | Higher h ->
+        List.iter update h.components
+  in
+  List.iter update (List.flatten (List.map (get_components) vec));
+  !results

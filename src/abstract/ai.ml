@@ -12,19 +12,24 @@ type parameters = {
   opponent : Actor.t list option;
 }
 
+type aggro =
+  | Appear
+  | Target
+  | Harm
+
 type behavior =
   | Act of (parameters -> Action.t)
   | Conditional of ((parameters -> bool) * behavior) list
   | Stochastic of (float * behavior) list
 
-type aggro =
-  | Appear
-  | Target
-  | Harm
+type conversation =
+  | Say of fstring
+  | Ask of fstring * (fstring * conversation array)
       
 type t = {
-  aggro    : aggro;
-  behavior : behavior;
+  aggro        : aggro;
+  behavior     : behavior;
+  conversation : conversation option;
 }
 
 let select_randomly options =

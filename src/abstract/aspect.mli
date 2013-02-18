@@ -23,3 +23,6 @@ val aspect_of_string : string -> t
 val string_of_aspect : t -> string
 
 val conflict : t -> t -> conflict_stats
+
+(* get the core aspect affinities from a regular aspect vector *)
+val affinities : t list -> (t * float) list
