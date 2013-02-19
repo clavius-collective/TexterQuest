@@ -1,0 +1,19 @@
+BYTE_ENABLED = true
+NATIVE_ENABLED = true
+OCAMLDEPFLAGS += -syntax camlp4o
+OCAMLFLAGS += -thread -syntax camlp4o
+
+USE_OCAMLFIND = true
+OCAMLPACKS[] =
+	str
+	threads
+	type_conv
+	bin_prot
+	sexplib
+	sexplib.syntax
+
+FILES[] =
+	util
+	mask
+
+.DEFAULT: $(OCamlLibrary libabstract, $(FILES))

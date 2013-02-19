@@ -3,7 +3,7 @@ NATIVE_ENABLED = true
 USE_OCAMLFIND = true
 
 .PHONY: clean
-.SUBDIRS: abstract server
+.SUBDIRS: abstract abstract2 server
 
 OCAMLFLAGS += -thread
 
