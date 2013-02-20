@@ -17,7 +17,7 @@ module type MASKABLE = sig
   type t with sexp
   type transform with sexp
     
-  val apply_transform : transform -> t -> t
+  val apply_transform : t -> transform -> t
 end
 
 module type T = sig
@@ -25,20 +25,12 @@ module type T = sig
   type base
   type transform
   type mask with sexp
-  type decay = mask -> mask option      (* TODO: sexpify *)
+  type decay
       
   val on_base : (base -> 'a) -> t -> 'a
     
   val expires_after : int -> decay
-    
-  val compose :
-    ?defer_same   : bool ->
-    ?defer_change : bool ->
-    ?defer_none   : bool ->
-    decay                ->
-    decay                ->
-    decay
-      
+
   val add_mask :
     description : fstring   ->
     transform   : transform ->
@@ -47,12 +39,27 @@ module type T = sig
     unit
 
   val get_value : t -> base
+
+  val create : base -> t
 end
 
 module Make = functor (M : MASKABLE) -> (struct
   type base = M.t with sexp
   type transform = M.transform with sexp
-  type decay = mask -> mask option
+
+  type predicate =
+    | Expires of int
+    | And of predicate * predicate
+    | Or of predicate * predicate
+    | Always
+  with sexp
+
+  type branch = {
+    predicate : predicate;
+    next      : mask option;
+  }
+
+  and decay = branch list
 
   and mask = {
     description : fstring;
@@ -65,33 +72,35 @@ module Make = functor (M : MASKABLE) -> (struct
     mutable masks : mask list;
   } with sexp
 
-  let on_base f x = f x.base
-
-  let get_masks t = t.masks
-  let set_masks t masks = t.masks <- masks
+  let make_decay ?(next = None) ?(branches = []) predicate =
+    {predicate; next}::branches
 
   let expires_after duration =
     let expiration = get_time () + duration in
-    (fun mask ->
-      let now = get_time () in
-      if now < expiration then Some mask else None)
+    make_decay (Expires expiration)
 
-  let compose
-      ?(defer_same   = false)
-      ?(defer_change = false)
-      ?(defer_none   = false)
-      decay decay' mask =
-    match decay mask with
-      | Some mask' when mask' == mask ->
-          if defer_same   then decay' mask' else Some mask'
-      | Some mask' ->
-          if defer_change then decay' mask' else Some mask'
-      | None ->
-          if defer_none   then decay' mask  else None
+  let check_decay mask =
+    let rec check_predicate = function
+      | Expires time -> time < get_time ()
+      | And (p, p')  -> check_predicate p && check_predicate p'
+      | Or (p, p')   -> check_predicate p || check_predicate p'
+      | Always       -> true
+    in
+    let rec select_branch = function
+      | [] -> Some mask
+      | branch::branches ->
+          if check_predicate branch.predicate then
+            branch.next
+          else
+            select_branch branches
+    in
+    select_branch mask.decay
 
-  let decays_after duration = compose ~defer_none:true (expires_after duration)
+  let on_base f x = f x.base
 
-  let check_decay mask = mask.decay mask
+  let get_masks t = t.masks
+
+  let set_masks t masks = t.masks <- masks
 
   let get_value t =
     let final_val, active =
@@ -100,7 +109,7 @@ module Make = functor (M : MASKABLE) -> (struct
           match check_decay mask with
             | None -> current, active
             | Some mask ->
-                M.apply_transform mask.transform current, mask::active)
+                M.apply_transform current mask.transform, mask::active)
         (get_masks t)
         (t.base, [])
     in
@@ -116,4 +125,11 @@ module Make = functor (M : MASKABLE) -> (struct
       }
     in
     set_masks t (mask::(get_masks t))
+
+  let create base =
+    {
+      base = base;
+      masks = [];
+    }
+
 end : T with type base = M.t and type transform = M.transform)

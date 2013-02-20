@@ -16,17 +16,13 @@ open Sexplib.Std
 module type MASKABLE = sig
 
   (** the type of the object on which masks will be acting *)
-  type t
-  val sexp_of_t : t -> Sexplib.Sexp.t
-  val t_of_sexp : Sexplib.Sexp.t -> t
+  type t with sexp
 
   (** serializable type that can be interpreted to change a t *)
-  type transform
-  val sexp_of_transform : transform -> Sexplib.Sexp.t
-  val transform_of_sexp : Sexplib.Sexp.t -> transform
+  type transform with sexp
 
   (** interpret a transform *)
-  val apply_transform : transform -> t -> t
+  val apply_transform : t -> transform -> t
 
 end
 
@@ -36,9 +32,7 @@ end
 module type T = sig
 
   (** record storing a base value and a list of masks *)
-  type t
-  val sexp_of_t : t -> Sexplib.Sexp.t
-  val t_of_sexp : Sexplib.Sexp.t -> t
+  type t with sexp
 
   (** the t type of the module to which the functor is applied *)
   type base
@@ -47,19 +41,10 @@ module type T = sig
   type transform
 
   (** serializable record representing a mask in its totality *)
-  type mask
-  val sexp_of_mask : mask -> Sexplib.Sexp.t
-  val mask_of_sexp : Sexplib.Sexp.t -> mask
+  type mask with sexp
 
-  (** Function that will return whatever form the mask has, or None if the mask
-      has simply expired. An example would be a wound's decay function returning
-      a less serious wound after it has healed for some time.
-      
-      The reason this takes a mask instead of unit is to allow de facto
-      introspection. When a mask is checked for decay, it will be passed as the
-      argument to its own decay function. Critically, this allows the decay
-      function to return the mask itself, signifying no change. *)
-  type decay = mask -> mask option
+  (** list of branches *)
+  type decay
 
   (** alters a function to operate on a mask-carrying record *)
   val on_base : (base -> 'a) -> t -> 'a
@@ -76,22 +61,6 @@ module type T = sig
       the same time. *)
   val expires_after : int -> decay
 
-  (** Given two decay functions, return a decay function which starts by
-      applying the first (decay) to the argument mask. If the defer_* flag
-      corresponding to the return value is set to true, take the result (in the
-      Some cases) or the original mask (in the None) case, and apply the second
-      decay function (decay') to it, then return the result of that call.
-      
-      The defer flags are all false by default, indicating that decay' will not
-      be applied at all unless one or more are manually set to true. *)
-  val compose :
-    ?defer_same   : bool ->
-    ?defer_change : bool ->
-    ?defer_none   : bool ->
-    decay                ->
-    decay                ->
-    decay
-
   (** Assemble the components of a mask, and apply them to a mask-bearing t. *)
   val add_mask :
     description : fstring   ->
@@ -102,6 +71,8 @@ module type T = sig
 
   (** Find the current value of a maskable object, by applying its masks. *)
   val get_value : t -> base
+
+  val create : base -> t
 end
 
 module Make : functor (M : MASKABLE) ->

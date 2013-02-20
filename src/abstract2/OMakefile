@@ -15,5 +15,6 @@ OCAMLPACKS[] =
 FILES[] =
 	util
 	mask
+	test
 
-.DEFAULT: $(OCamlLibrary libabstract, $(FILES))
+.DEFAULT: $(OCamlProgram test, $(FILES))
