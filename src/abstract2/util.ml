@@ -27,7 +27,9 @@ type fstring =
   | Concat    of fstring list
 with sexp
 
-let get_time () = truncate (Unix.time ())
+let (@@) f x = f x
+
+let get_time () = truncate @@ Unix.time ()
 
 let generate f =
   let _counter = ref 0 in
@@ -36,8 +38,6 @@ let generate f =
     f !_counter x
 
 let generate_str s f = generate (fun i -> f (s ^ "_" ^ (string_of_int i)))
-
-let (@@) f x = f x
 
 let (<<) list_ref elt = list_ref := elt :: !list_ref
 

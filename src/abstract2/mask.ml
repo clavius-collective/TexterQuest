@@ -2,13 +2,6 @@
 (* mask.ml, part of TexterQuest *)
 (* LGPLv3 *)
 
-(* TODO
- *   for serializability
- *     need: serializable mask type
- *     need: apply : mask -> base -> base
- *     provide: serializable decay type
- *)
-
 include Util
 include Sexplib
 include Sexplib.Std
@@ -52,6 +45,7 @@ module Make = functor (M : MASKABLE) -> (struct
     | And of predicate * predicate
     | Or of predicate * predicate
     | Always
+    | Never
   with sexp
 
   type branch = {
@@ -75,6 +69,7 @@ module Make = functor (M : MASKABLE) -> (struct
   let make_decay ?(next = None) ?(branches = []) predicate =
     {predicate; next}::branches
 
+  (* lasts between n and n+1 seconds *)
   let expires_after duration =
     let expiration = get_time () + duration in
     make_decay (Expires expiration)
@@ -85,6 +80,7 @@ module Make = functor (M : MASKABLE) -> (struct
       | And (p, p')  -> check_predicate p && check_predicate p'
       | Or (p, p')   -> check_predicate p || check_predicate p'
       | Always       -> true
+      | Never        -> false
     in
     let rec select_branch = function
       | [] -> Some mask
@@ -107,7 +103,8 @@ module Make = functor (M : MASKABLE) -> (struct
       List.fold_right
         (fun mask (current, active) ->
           match check_decay mask with
-            | None -> current, active
+            | None -> 
+                current, active
             | Some mask ->
                 M.apply_transform current mask.transform, mask::active)
         (get_masks t)

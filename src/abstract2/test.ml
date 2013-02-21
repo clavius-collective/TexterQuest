@@ -37,7 +37,9 @@ let _ =
   add_mask
     ~description:(Raw "yo")
     ~transform:(Rename "bar")
-    ~decay:(expires_after 20)
+    ~decay:(expires_after 0)
     x;
   print_endline (to_s x);
-  print_endline (Sexplib.Sexp.to_string (sexp_of_b (get_value x)))
+  Thread.delay 0.2;
+  print_endline (Sexplib.Sexp.to_string (sexp_of_b (get_value x)));
+  print_endline (to_s x)

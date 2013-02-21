@@ -24,7 +24,7 @@ type fstring =
   | Concat    of fstring list
 with sexp
 
-(* return an int representing the current time *)
+(* return a int representing the current time *)
 val get_time : unit -> int
 
 (* supply a counter that will be incremented each time f is called *)
