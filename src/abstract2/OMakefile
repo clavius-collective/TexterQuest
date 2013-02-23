@@ -29,6 +29,7 @@ section
 
 	TEST_FILES[] =
 		util_test
+		core_test
 		mask_test
 		all_test
 
