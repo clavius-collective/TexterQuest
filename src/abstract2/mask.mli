@@ -9,6 +9,7 @@
 *)
 
 open Util
+open Core
 open Sexplib
 open Sexplib.Std
 

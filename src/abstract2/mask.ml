@@ -3,6 +3,7 @@
 (* LGPLv3 *)
 
 include Util
+include Core
 include Sexplib
 include Sexplib.Std
 
@@ -128,5 +129,7 @@ module Make = functor (M : MASKABLE) -> (struct
       base = base;
       masks = [];
     }
+
+  let describe mask = mask.description
 
 end : T with type base = M.t and type transform = M.transform)

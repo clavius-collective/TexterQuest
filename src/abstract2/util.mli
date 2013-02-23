@@ -2,28 +2,6 @@
 (* types.mli, part of TexterQuest *)
 (* LGPLv3 *)
 
-(* fundamental data types *)
-type room_id = string
-
-type username = string
-
-(* formatted output *)
-type color = int
-
-type modifier =
-  | Bold
-  | Italic
-  | Underline
-  | Color of color
-with sexp
-
-type fstring =
-  | Raw       of string
-  | Modified  of modifier * fstring
-  | Sections  of fstring list
-  | Concat    of fstring list
-with sexp
-
 (* return a int representing the current time *)
 val get_time : unit -> int
 
@@ -37,7 +15,7 @@ val generate_str : string -> (string -> 'a -> 'b) -> 'a -> 'b
 val (@@) : ('a -> 'b) -> 'a -> 'b
   
 (* return a copy of a list with the specified item removed *)
-val remove : 'a -> 'a list -> 'a list
+val list_remove : 'a -> 'a list -> 'a list
   
 (* like = but cooler *)
 val matches_ignore_case : string -> string -> bool
@@ -61,8 +39,3 @@ val hash_size : int
 val take_some : 'a option list -> 'a list
 
 val (|?) : 'a option -> 'a -> 'a
-
-module type DESCRIBE = sig
-  type t
-  val describe : t -> fstring
-end

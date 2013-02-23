@@ -18,6 +18,7 @@ OCAMLPACKS[] =
 
 FILES[] =
 	util
+	core
 	mask
 
 section
