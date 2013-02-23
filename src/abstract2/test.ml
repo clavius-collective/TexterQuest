@@ -1,6 +1,7 @@
 include Util
-open Sexplib
-open Sexplib.Std
+include Core
+include Sexplib
+include Sexplib.Std
 
 type t' = I of int | F of float with sexp
 
