@@ -1,9 +1,12 @@
 BYTE_ENABLED = true
 NATIVE_ENABLED = true
+
+USE_OCAMLFIND = true
 OCAMLDEPFLAGS += -syntax camlp4o
 OCAMLFLAGS += -thread -syntax camlp4o
 
-USE_OCAMLFIND = true
+LIBRARY = libabstract
+
 OCAMLPACKS[] =
 	str
 	threads
@@ -11,10 +14,29 @@ OCAMLPACKS[] =
 	bin_prot
 	sexplib
 	sexplib.syntax
+	oUnit
 
 FILES[] =
 	util
 	mask
-	test
 
-.DEFAULT: $(OCamlProgram test, $(FILES))
+section
+	.DEFAULT: $(OCamlLibrary $(LIBRARY), $(FILES))
+
+section
+	PROGRAM = test
+
+	TEST_FILES[] =
+		util_test
+		mask_test
+		all_test
+
+	comma = ,
+	OCAML_FIND_PACKAGES = -package $(concat $(comma),$(OCAMLPACKS))
+	.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES) $(TEST_FILES))
+		ocamlfind ocamldoc \
+			-thread -syntax camlp4o \
+			$(OCAML_FIND_PACKAGES) \
+			-html -d doc \
+			*.mli
+		./test
