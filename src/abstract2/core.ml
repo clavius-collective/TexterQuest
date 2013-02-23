@@ -28,3 +28,5 @@ type fstring =
 with sexp
 
 type tag
+
+let hash_size = 100

@@ -14,7 +14,7 @@ module type MASKABLE = sig
   val apply_transform : t -> transform -> t
 end
 
-module type T = sig
+module type MASKED = sig
   type t with sexp
   type base
   type transform
@@ -72,12 +72,12 @@ module Make = functor (M : MASKABLE) -> (struct
 
   (* lasts between n and n+1 seconds *)
   let expires_after duration =
-    let expiration = get_time () + duration in
+    let expiration = int_time () + duration in
     make_decay (Expires expiration)
 
   let check_decay mask =
     let rec check_predicate = function
-      | Expires time -> time < get_time ()
+      | Expires time -> time < int_time ()
       | And (p, p')  -> check_predicate p && check_predicate p'
       | Or (p, p')   -> check_predicate p || check_predicate p'
       | Always       -> true
@@ -132,4 +132,4 @@ module Make = functor (M : MASKABLE) -> (struct
 
   let describe mask = mask.description
 
-end : T with type base = M.t and type transform = M.transform)
+end : MASKED with type base = M.t and type transform = M.transform)
