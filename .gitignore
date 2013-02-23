@@ -15,3 +15,6 @@
 .typerex
 *.omc
 .omakedb*
+test
+unit_test*
+doc

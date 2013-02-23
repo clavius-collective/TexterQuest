@@ -25,7 +25,8 @@ section
 	.DEFAULT: $(OCamlLibrary $(LIBRARY), $(FILES))
 
 section
-	PROGRAM = test
+	PROGRAM = unit_test
+	DOC_DIRECTORY = doc
 
 	TEST_FILES[] =
 		util_test
@@ -39,6 +40,6 @@ section
 		ocamlfind ocamldoc \
 			-thread -syntax camlp4o \
 			$(OCAML_FIND_PACKAGES) \
-			-html -d doc \
+			-html -d $(DOC_DIRECTORY) \
 			*.mli
-		./test
+		./$(PROGRAM)
