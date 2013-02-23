@@ -14,10 +14,10 @@ type room_id = string
 (** Uniquely identifies a player, as distinct from a player character. *)
 type username = string
 
-(** Text color (see {!modifier}) *)
+(** Text color (see {!modifier}). *)
 type color = int
 
-(** Text formatting options used in {!fstring} *)
+(** Text formatting options used in {!fstring}. *)
 type modifier =
   | Bold
   | Italic
@@ -40,6 +40,8 @@ with sexp
     tags can be used in predicates, for example, when examining an object for
     ongoing magical effects. *)
 type tag
+with sexp
 
-(** the size of the hash tables storing information *)
+(** The size of the hash tables storing information. Eventually, this will
+    hopefully be replaced with something smarter. *)
 val hash_size : int

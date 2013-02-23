@@ -39,15 +39,15 @@ val (|?) : 'a option -> 'a -> 'a
 (** Additional functionality for lists. *)
 module List' : sig
 
-  (** filter a list of options to just get the Some values *)
+  (** Filter a list of options to just get the Some values. *)
   val take_some : 'a option list -> 'a list
 
-  (** return a copy of a list with all instances of the specified item
-      removed *)
+  (** Return a copy of a list with all instances of the specified item
+      removed. *)
   val remove_all : 'a -> 'a list -> 'a list
 
-  (** return a copy of a list with the first instance of the specified item
-      removed *)
+  (** Return a copy of a list with the first instance of the specified item
+      removed. *)
   val remove_one : 'a -> 'a list -> 'a list
   
 end

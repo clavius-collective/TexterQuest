@@ -29,6 +29,7 @@ module type MASKED = sig
     description : fstring   ->
     transform   : transform ->
     decay       : decay     ->
+    ?tags       : tag list  ->
     t                       ->
     unit
 
@@ -41,6 +42,7 @@ module Make = functor (M : MASKABLE) -> (struct
   type base = M.t with sexp
   type transform = M.transform with sexp
 
+  (* TODO: export this in the .mli *)
   type predicate =
     | Expires of int
     | And of predicate * predicate
@@ -60,6 +62,7 @@ module Make = functor (M : MASKABLE) -> (struct
     description : fstring;
     transform   : transform;
     decay       : decay;
+    tags        : tag list;
   } with sexp
 
   type t = {
@@ -67,6 +70,7 @@ module Make = functor (M : MASKABLE) -> (struct
     mutable masks : mask list;
   } with sexp
 
+  (* TODO: export this in the .mli *)
   let make_decay ?(next = None) ?(branches = []) predicate =
     {predicate; next}::branches
 
@@ -84,7 +88,8 @@ module Make = functor (M : MASKABLE) -> (struct
       | Never        -> false
     in
     let rec select_branch = function
-      | [] -> Some mask
+      (* fold through the predicates by which the mask could decay *)
+      | [] -> Some mask (* if no predicate matches, the mask is unchanged *)
       | branch::branches ->
           if check_predicate branch.predicate then
             branch.next
@@ -114,12 +119,13 @@ module Make = functor (M : MASKABLE) -> (struct
     set_masks t active;
     final_val
 
-  let add_mask ~description ~transform ~decay t =
+  let add_mask ~description ~transform ~decay ?(tags=[]) t =
     let mask =
       {
         description;
         transform;
         decay;
+        tags
       }
     in
     set_masks t (mask::(get_masks t))
