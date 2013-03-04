@@ -41,7 +41,7 @@ module type T = sig
   (** the same as the transform type of the module acted on by the functor *)
   type transform
 
-  (** serializable record representing a mask in its totality *)
+  (** serializable record representing a mask in its totality. *)
   type mask with sexp
 
   (** list of branches *)

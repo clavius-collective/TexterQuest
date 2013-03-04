@@ -20,9 +20,20 @@ FILES[] =
 	util
 	core
 	mask
+	action
+	commandparse
+	commandlex
+	command
 
 section
-	.DEFAULT: $(OCamlLibrary $(LIBRARY), $(FILES))
+	.PHONY: commandparser
+
+	commandparser:
+		ocamlyacc -v commandparse.mly
+		rm commandparse.mli
+		ocamllex commandlex.mll
+
+	.DEFAULT: commandparser $(OCamlLibrary $(LIBRARY), $(FILES))
 
 section
 	PROGRAM = unit_test
@@ -32,6 +43,7 @@ section
 		util_test
 		core_test
 		mask_test
+		command_test
 		all_test
 
 	comma = ,
