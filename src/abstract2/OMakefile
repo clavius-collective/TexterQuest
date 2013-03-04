@@ -36,8 +36,29 @@ section
 	.DEFAULT: commandparser $(OCamlLibrary $(LIBRARY), $(FILES))
 
 section
-	PROGRAM = unit_test
 	DOC_DIRECTORY = doc
+	DOC_FILES = $(filter-exists $(addsuffixes .ml .mli, $(FILES)))
+
+	Document(doctype) = 
+		warn = -warn-error A
+		comma = ,
+		OCAML_FIND_PACKAGES = -package $(concat $(comma),$(OCAMLPACKS))
+		DOC_FLAGS = $(filter-out $(warn), $(OCAMLFLAGS))
+		$(OCAMLFIND) ocamldoc $(DOC_FLAGS) $(OCAML_FIND_PACKAGES) \
+			-$(doctype) -d $(DOC_DIRECTORY) $(DOC_FILES)
+
+	Dependencies(format) =
+		Document(dot)
+		dot -T$(format) ocamldoc.out >$(LIBRARY).$(format)
+		cp $(LIBRARY).$(format) ../../docs/modules
+		rm ocamldoc.out
+
+	.DEFAULT:
+		Document(html -short-functors)
+		Dependencies(pdf)
+
+section
+	PROGRAM = unit_test
 
 	TEST_FILES[] =
 		util_test
@@ -46,12 +67,5 @@ section
 		command_test
 		all_test
 
-	comma = ,
-	OCAML_FIND_PACKAGES = -package $(concat $(comma),$(OCAMLPACKS))
 	.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES) $(TEST_FILES))
-		ocamlfind ocamldoc \
-			-thread -syntax camlp4o \
-			$(OCAML_FIND_PACKAGES) \
-			-html -d $(DOC_DIRECTORY) \
-			*.mli
 		./$(PROGRAM)
