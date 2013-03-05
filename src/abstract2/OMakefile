@@ -25,15 +25,14 @@ FILES[] =
 	commandlex
 	command
 
-section
-	.PHONY: commandparser
+commandparser:
+	ocamlyacc -v commandparse.mly
+	rm commandparse.mli
+	ocamllex commandlex.mll
 
-	commandparser:
-		ocamlyacc -v commandparse.mly
-		rm commandparse.mli
-		ocamllex commandlex.mll
+compile: commandparser $(OCamlLibrary $(LIBRARY), $(FILES))
 
-	.DEFAULT: commandparser $(OCamlLibrary $(LIBRARY), $(FILES))
+.PHONY:	compile commandparser all test
 
 section
 	DOC_DIRECTORY = doc
@@ -53,7 +52,7 @@ section
 		cp $(LIBRARY).$(format) ../../docs/modules
 		rm ocamldoc.out
 
-	.DEFAULT:
+	doc: compile
 		Document(html -short-functors)
 		Dependencies(pdf)
 
@@ -67,5 +66,8 @@ section
 		command_test
 		all_test
 
-	.DEFAULT: $(OCamlProgram $(PROGRAM), $(FILES) $(TEST_FILES))
+	test: compile $(OCamlProgram $(PROGRAM), $(FILES) $(TEST_FILES))
 		./$(PROGRAM)
+
+all: compile test doc
+.DEFAULT: all
